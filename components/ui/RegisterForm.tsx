@@ -19,6 +19,7 @@ async function signUpNewUser() {
 	});
 }
 
+
 function MyForm() {
 	const {
 		control,
