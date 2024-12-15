@@ -21,7 +21,11 @@
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/native": "^7.0.0",
     "@supabase/supabase-js": "^2.47.6",
+<<<<<<< HEAD
     "dotenv": "^16.4.7",
+=======
+    "eas-cli": "^14.2.0",
+>>>>>>> 718c2ceacfd225b15ba0041129fc0f0cac8fec0a
     "expo": "~52.0.11",
     "expo-blur": "~14.0.1",
     "expo-constants": "~17.0.3",

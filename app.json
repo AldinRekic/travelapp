@@ -9,13 +9,23 @@
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
 		"ios": {
+<<<<<<< HEAD
 			"supportsTablet": true
+=======
+			"supportsTablet": true,
+			"bundleIdentifier": "com.itslucky.travelapp"
+>>>>>>> 718c2ceacfd225b15ba0041129fc0f0cac8fec0a
 		},
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
+<<<<<<< HEAD
 			}
+=======
+			},
+			"package": "com.itslucky.travelapp"
+>>>>>>> 718c2ceacfd225b15ba0041129fc0f0cac8fec0a
 		},
 		"web": {
 			"bundler": "metro",
@@ -32,6 +42,7 @@
 					"resizeMode": "contain",
 					"backgroundColor": "#ffffff"
 				}
+<<<<<<< HEAD
 			],
 			[
 				"expo-build-properties",
@@ -43,14 +54,24 @@
 						"enableProguardInReleaseBuilds": true
 					}
 				}
+=======
+>>>>>>> 718c2ceacfd225b15ba0041129fc0f0cac8fec0a
 			]
 		],
 		"experiments": {
 			"typedRoutes": true
 		},
 		"extra": {
+<<<<<<< HEAD
 			"eas": {
 				"projectId": "your-project-id"
+=======
+			"router": {
+				"origin": false
+			},
+			"eas": {
+				"projectId": "e77e74b3-2c64-4361-b479-df2a41050827"
+>>>>>>> 718c2ceacfd225b15ba0041129fc0f0cac8fec0a
 			}
 		}
 	}
