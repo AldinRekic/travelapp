@@ -5,6 +5,7 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Text } from "react-native-reanimated/lib/typescript/Animated";
+import RegisterForm from "@/components/ui/RegisterForm";
 
 export default function HomeScreen() {
 	return (
@@ -17,6 +18,7 @@ export default function HomeScreen() {
 				/>
 			}
 		>
+			<RegisterForm></RegisterForm>
 			<ThemedView style={styles.titleContainer}>
 				<ThemedText type="title" className="bg-green-500">
 					!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
