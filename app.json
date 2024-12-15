@@ -9,7 +9,7 @@
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
 		"ios": {
-<<<<<<< HEAD
+			"support<<<<<<< HEAD
 			"supportsTablet": true
 =======
 			"supportsTablet": true,
@@ -72,7 +72,3 @@
 			"eas": {
 				"projectId": "e77e74b3-2c64-4361-b479-df2a41050827"
 >>>>>>> 718c2ceacfd225b15ba0041129fc0f0cac8fec0a
-			}
-		}
-	}
-}
