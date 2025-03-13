@@ -26,7 +26,12 @@ export default function LoginForm() {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      email: "test@example.com",
+      password: "password123"
+    }
+  });
   const [error, setError] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
   const MAX_ATTEMPTS = 3;
@@ -190,10 +195,6 @@ export default function LoginForm() {
           <ThemedText className="text-blue-500 text-sm">Sign Up</ThemedText>
         </TouchableOpacity>
       </View>
-
-      <ThemedText className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-        Test credentials: test@example.com / password123
-      </ThemedText>
     </View>
   );
 } 
