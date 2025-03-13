@@ -5,7 +5,8 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { router } from "expo-router";
 import { FinancialOverview } from "@/components/ui/FinancialOverview";
 import { QuickAddTripModal } from "@/components/ui/QuickAddTripModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Trip = {
   id: string;
@@ -17,13 +18,22 @@ type Trip = {
   description: string;
 };
 
+// Helper function to generate dates
+const generateDate = (daysAgo: number, hour: number, minute: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  date.setHours(hour, minute, 0, 0);
+  return date;
+};
+
 // Initial dummy data for trips
 const initialTrips: Trip[] = [
+  // Today's trips
   {
     id: "1",
     origin: "Home",
     destination: "Work",
-    date: new Date(),
+    date: generateDate(0, 7, 30),
     transportType: "Bus",
     cost: 2.50,
     description: "Morning commute"
@@ -32,25 +42,140 @@ const initialTrips: Trip[] = [
     id: "2",
     origin: "Work",
     destination: "Gym",
-    date: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
+    date: generateDate(0, 17, 30),
     transportType: "Train",
     cost: 2.50,
     description: "Evening workout"
   },
+  // Yesterday's trips
   {
     id: "3",
     origin: "Home",
-    destination: "Shopping",
-    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+    destination: "Work",
+    date: generateDate(1, 7, 45),
     transportType: "Bus",
     cost: 2.50,
-    description: "Weekend shopping"
+    description: "Morning commute"
+  },
+  {
+    id: "4",
+    origin: "Work",
+    destination: "Shopping",
+    date: generateDate(1, 15, 0),
+    transportType: "Train",
+    cost: 2.50,
+    description: "Lunch break shopping"
+  },
+  // Last week's trips
+  {
+    id: "5",
+    origin: "Home",
+    destination: "Work",
+    date: generateDate(7, 8, 0),
+    transportType: "Bus",
+    cost: 2.50,
+    description: "Morning commute"
+  },
+  {
+    id: "6",
+    origin: "Work",
+    destination: "Doctor",
+    date: generateDate(7, 14, 30),
+    transportType: "Train",
+    cost: 2.50,
+    description: "Medical appointment"
+  },
+  // Two weeks ago
+  {
+    id: "7",
+    origin: "Home",
+    destination: "Work",
+    date: generateDate(14, 7, 30),
+    transportType: "Bus",
+    cost: 2.50,
+    description: "Morning commute"
+  },
+  {
+    id: "8",
+    origin: "Work",
+    destination: "Home",
+    date: generateDate(14, 18, 0),
+    transportType: "Bus",
+    cost: 2.50,
+    description: "Evening commute"
+  },
+  // Three weeks ago
+  {
+    id: "9",
+    origin: "Home",
+    destination: "Work",
+    date: generateDate(21, 8, 15),
+    transportType: "Bus",
+    cost: 2.50,
+    description: "Morning commute"
+  },
+  {
+    id: "10",
+    origin: "Work",
+    destination: "Gym",
+    date: generateDate(21, 17, 45),
+    transportType: "Train",
+    cost: 2.50,
+    description: "Evening workout"
   }
 ];
 
+const STORAGE_KEY = '@travelapp_trips';
+
+// Function to load trips from storage
+const loadTrips = async (): Promise<Trip[]> => {
+  try {
+    const storedTrips = await AsyncStorage.getItem(STORAGE_KEY);
+    if (storedTrips) {
+      const parsedTrips = JSON.parse(storedTrips);
+      // Convert date strings back to Date objects
+      return parsedTrips.map((trip: any) => ({
+        ...trip,
+        date: new Date(trip.date)
+      }));
+    }
+    return initialTrips;
+  } catch (error) {
+    console.error('Error loading trips:', error);
+    return initialTrips;
+  }
+};
+
+// Function to save trips to storage
+const saveTrips = async (trips: Trip[]) => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+  } catch (error) {
+    console.error('Error saving trips:', error);
+  }
+};
+
 export default function UserScreen() {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [trips, setTrips] = useState<Trip[]>(initialTrips);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load trips when component mounts
+  useEffect(() => {
+    const loadInitialTrips = async () => {
+      const loadedTrips = await loadTrips();
+      setTrips(loadedTrips);
+      setIsLoading(false);
+    };
+    loadInitialTrips();
+  }, []);
+
+  // Save trips whenever they change
+  useEffect(() => {
+    if (!isLoading) {
+      saveTrips(trips);
+    }
+  }, [trips, isLoading]);
 
   const handleNewTrip = () => {
     setShowQuickAdd(true);
@@ -105,6 +230,14 @@ export default function UserScreen() {
 
   // Calculate total cost from all trips
   const totalCost = trips.reduce((sum, trip) => sum + trip.cost, 0);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ThemedText>Loading trips...</ThemedText>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
