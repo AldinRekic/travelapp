@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, TouchableOpacity, View, Image } from "react-native";
+import { StyleSheet, ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -10,16 +10,9 @@ import UserLevelCard from "@/components/ui/UserLevelCard";
 import { calculateLevel, calculateXPForNextLevel, calculateCurrentLevelXP, getXPForTrip, addXP } from "@/utils/levelSystem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-}
-
 interface Trip {
   id: string;
-  date: string;
+  date: Date;
   origin: string;
   destination: string;
   transportType: string;
@@ -43,20 +36,20 @@ const initialTrips: Trip[] = [
     id: "1",
     origin: "Home",
     destination: "Work",
-    date: generateDate(0, 7, 30).toISOString(),
+    date: generateDate(0, 7, 30),
     transportType: "Bus",
     cost: 2.50,
-    distance: 0,
+    distance: 5,
     description: "Morning commute"
   },
   {
     id: "2",
     origin: "Work",
     destination: "Gym",
-    date: generateDate(0, 17, 30).toISOString(),
+    date: generateDate(0, 17, 30),
     transportType: "Train",
     cost: 2.50,
-    distance: 0,
+    distance: 3,
     description: "Evening workout"
   },
   // Yesterday's trips
@@ -64,20 +57,20 @@ const initialTrips: Trip[] = [
     id: "3",
     origin: "Home",
     destination: "Work",
-    date: generateDate(1, 7, 45).toISOString(),
+    date: generateDate(1, 7, 45),
     transportType: "Bus",
     cost: 2.50,
-    distance: 0,
+    distance: 5,
     description: "Morning commute"
   },
   {
     id: "4",
     origin: "Work",
     destination: "Shopping",
-    date: generateDate(1, 15, 0).toISOString(),
+    date: generateDate(1, 15, 0),
     transportType: "Train",
     cost: 2.50,
-    distance: 0,
+    distance: 2,
     description: "Lunch break shopping"
   },
   // Last week's trips
@@ -85,20 +78,20 @@ const initialTrips: Trip[] = [
     id: "5",
     origin: "Home",
     destination: "Work",
-    date: generateDate(7, 8, 0).toISOString(),
+    date: generateDate(7, 8, 0),
     transportType: "Bus",
     cost: 2.50,
-    distance: 0,
+    distance: 5,
     description: "Morning commute"
   },
   {
     id: "6",
     origin: "Work",
     destination: "Doctor",
-    date: generateDate(7, 14, 30).toISOString(),
+    date: generateDate(7, 14, 30),
     transportType: "Train",
     cost: 2.50,
-    distance: 0,
+    distance: 4,
     description: "Medical appointment"
   },
   // Two weeks ago
@@ -106,20 +99,20 @@ const initialTrips: Trip[] = [
     id: "7",
     origin: "Home",
     destination: "Work",
-    date: generateDate(14, 7, 30).toISOString(),
+    date: generateDate(14, 7, 30),
     transportType: "Bus",
     cost: 2.50,
-    distance: 0,
+    distance: 5,
     description: "Morning commute"
   },
   {
     id: "8",
     origin: "Work",
     destination: "Home",
-    date: generateDate(14, 18, 0).toISOString(),
+    date: generateDate(14, 18, 0),
     transportType: "Bus",
     cost: 2.50,
-    distance: 0,
+    distance: 5,
     description: "Evening commute"
   },
   // Three weeks ago
@@ -127,20 +120,20 @@ const initialTrips: Trip[] = [
     id: "9",
     origin: "Home",
     destination: "Work",
-    date: generateDate(21, 8, 15).toISOString(),
+    date: generateDate(21, 8, 15),
     transportType: "Bus",
     cost: 2.50,
-    distance: 0,
+    distance: 5,
     description: "Morning commute"
   },
   {
     id: "10",
     origin: "Work",
     destination: "Gym",
-    date: generateDate(21, 17, 45).toISOString(),
+    date: generateDate(21, 17, 45),
     transportType: "Train",
     cost: 2.50,
-    distance: 0,
+    distance: 3,
     description: "Evening workout"
   }
 ];
@@ -176,27 +169,30 @@ const saveTrips = async (trips: Trip[]) => {
 };
 
 export default function UserScreen() {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isQuickAddModalVisible, setIsQuickAddModalVisible] = useState(false);
-  const [trips, setTrips] = useState<Trip[]>(initialTrips);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [userXP, setUserXP] = useState(0);
   const [userLevel, setUserLevel] = useState(1);
+  const [userName, setUserName] = useState("Test User");
 
+  // Load trips when component mounts
   useEffect(() => {
-    loadUserData();
+    const loadInitialTrips = async () => {
+      const loadedTrips = await loadTrips();
+      setTrips(loadedTrips);
+      setIsLoading(false);
+    };
+    loadInitialTrips();
     loadUserXP();
   }, []);
 
-  const loadUserData = async () => {
-    try {
-      const storedData = await AsyncStorage.getItem("userData");
-      if (storedData) {
-        setUserData(JSON.parse(storedData));
-      }
-    } catch (error) {
-      console.error("Error loading user data:", error);
+  // Save trips whenever they change
+  useEffect(() => {
+    if (!isLoading) {
+      saveTrips(trips);
     }
-  };
+  }, [trips, isLoading]);
 
   const loadUserXP = async () => {
     try {
@@ -211,6 +207,14 @@ export default function UserScreen() {
     }
   };
 
+  const handleNewTrip = () => {
+    setShowQuickAdd(true);
+  };
+
+  const handleTripPress = (tripId: string) => {
+    router.push(`/(tabs)/trip/${tripId}` as any);
+  };
+
   const handleQuickAddSubmit = async (tripData: {
     date: Date;
     origin: string;
@@ -220,135 +224,138 @@ export default function UserScreen() {
     description?: string;
     distance: number;
   }) => {
-    try {
-      const newTrip: Trip = {
-        id: Date.now().toString(),
-        date: tripData.date.toISOString(),
-        origin: tripData.origin,
-        destination: tripData.destination,
-        transportType: tripData.transportType,
-        cost: tripData.cost,
-        distance: tripData.distance,
-        description: tripData.description || "",
-      };
+    const newTrip: Trip = {
+      id: Date.now().toString(),
+      date: tripData.date,
+      origin: tripData.origin,
+      destination: tripData.destination,
+      transportType: tripData.transportType,
+      cost: tripData.cost,
+      distance: tripData.distance,
+      description: tripData.description || "",
+    };
 
-      // Calculate XP for the new trip
-      const tripXP = getXPForTrip(tripData.distance, tripData.transportType);
-      const newXP = addXP(userXP, tripXP);
-      
-      // Update XP and level
-      await AsyncStorage.setItem("userXP", newXP.toString());
-      setUserXP(newXP);
-      setUserLevel(calculateLevel(newXP));
+    // Calculate XP for the new trip
+    const tripXP = getXPForTrip(tripData.distance, tripData.transportType);
+    const newXP = addXP(userXP, tripXP);
+    
+    // Update XP and level
+    await AsyncStorage.setItem("userXP", newXP.toString());
+    setUserXP(newXP);
+    setUserLevel(calculateLevel(newXP));
 
-      // Add trip to state
-      setTrips(prevTrips => [newTrip, ...prevTrips]);
-      setIsQuickAddModalVisible(false);
-    } catch (error) {
-      console.error("Error adding trip:", error);
+    setTrips([newTrip, ...trips]);
+    setShowQuickAdd(false);
+  };
+
+  const formatDate = (date: Date) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
   };
 
-  const handleNewTrip = () => {
-    setIsQuickAddModalVisible(true);
-  };
-
-  const handleTripPress = (tripId: string) => {
-    router.push(`/(tabs)/trip/${tripId}` as any);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString();
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    });
   };
 
   // Calculate total cost from all trips
   const totalCost = trips.reduce((sum, trip) => sum + trip.cost, 0);
 
-  if (userData === null) {
+  if (isLoading) {
     return (
       <View style={styles.container}>
-        <ThemedText>Loading user data...</ThemedText>
+        <ThemedText>Loading trips...</ThemedText>
       </View>
     );
   }
 
   return (
-    <ThemedView className="flex-1">
-      <ScrollView className="flex-1">
-        <View className="p-4">
-          {userData && (
-            <View className="items-center mb-4">
-              <Image
-                source={{ uri: userData.avatar }}
-                className="w-20 h-20 rounded-full mb-2"
-              />
-              <ThemedText className="text-xl font-bold">{userData.name}</ThemedText>
-              <ThemedText className="text-gray-500">{userData.email}</ThemedText>
-            </View>
-          )}
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <ThemedText type="title">My Climate Journey</ThemedText>
+        <ThemedText style={styles.subtitle}>Track your impact and savings</ThemedText>
+      </View>
 
-          <UserLevelCard
-            level={userLevel}
-            currentXP={calculateCurrentLevelXP(userXP, userLevel)}
-            xpToNextLevel={calculateXPForNextLevel(userLevel)}
-          />
+      <UserLevelCard
+        level={userLevel}
+        currentXP={calculateCurrentLevelXP(userXP, userLevel)}
+        xpToNextLevel={calculateXPForNextLevel(userLevel)}
+      />
 
-          <FinancialOverview
-            totalTrips={trips.length}
-            totalDistance={trips.reduce((sum, trip) => sum + trip.distance, 0)}
-            totalCost={trips.reduce((sum, trip) => sum + trip.cost, 0)}
-            klimaTicketCost={1090}
-          />
+      <FinancialOverview
+        totalTrips={trips.length}
+        totalDistance={trips.reduce((sum, trip) => sum + trip.distance, 0)}
+        totalCost={totalCost}
+        klimaTicketCost={1090}
+      />
 
-          <View className="flex-row justify-between items-center mb-4">
-            <ThemedText className="text-xl font-bold">Recent Trips</ThemedText>
-            <TouchableOpacity
-              onPress={() => setIsQuickAddModalVisible(true)}
-              className="bg-blue-500 rounded-full p-2"
-            >
-              <ThemedText className="text-white text-xl">+</ThemedText>
-            </TouchableOpacity>
-          </View>
+      {/* Recent Trips */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <ThemedText type="subtitle">Recent Trips</ThemedText>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={handleNewTrip}
+          >
+            <IconSymbol name="plus.circle.fill" size={24} color="#007AFF" />
+            <ThemedText style={styles.addButtonText}>Add Trip</ThemedText>
+          </TouchableOpacity>
+        </View>
 
-          {trips.map((trip) => (
-            <TouchableOpacity
-              key={trip.id}
-              className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4"
-              onPress={() => handleTripPress(trip.id)}
-            >
-              <View className="flex-row justify-between items-start">
-                <View className="flex-1">
-                  <ThemedText className="text-lg font-semibold">
+        {trips.map((trip) => (
+          <TouchableOpacity
+            key={trip.id}
+            onPress={() => handleTripPress(trip.id)}
+          >
+            <ThemedView style={styles.tripCard}>
+              <View style={styles.tripHeader}>
+                <View>
+                  <ThemedText style={styles.tripTitle}>
                     {trip.origin} → {trip.destination}
                   </ThemedText>
-                  <ThemedText className="text-gray-500">
+                  <ThemedText style={styles.tripDate}>
                     {formatDate(trip.date)} {formatTime(trip.date)}
                   </ThemedText>
-                  <ThemedText className="text-gray-500">
-                    {trip.transportType} • {trip.distance} km • €{trip.cost.toFixed(2)}
-                  </ThemedText>
-                  {trip.description && (
-                    <ThemedText className="text-gray-500 mt-1">{trip.description}</ThemedText>
-                  )}
                 </View>
+                <ThemedText style={styles.tripCost}>€{trip.cost.toFixed(2)}</ThemedText>
               </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+              <View style={styles.tripDetails}>
+                <View style={styles.tripDetail}>
+                  <IconSymbol name="bus" size={16} color="#666" />
+                  <ThemedText style={styles.tripDetailText}>{trip.transportType}</ThemedText>
+                </View>
+                {trip.description && (
+                  <View style={styles.tripDetail}>
+                    <IconSymbol name="text.bubble" size={16} color="#666" />
+                    <ThemedText style={styles.tripDetailText}>{trip.description}</ThemedText>
+                  </View>
+                )}
+              </View>
+            </ThemedView>
+          </TouchableOpacity>
+        ))}
+      </View>
 
+      {/* Quick Add Trip Modal */}
       <QuickAddTripModal
-        visible={isQuickAddModalVisible}
-        onClose={() => setIsQuickAddModalVisible(false)}
+        visible={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
         onSubmit={handleQuickAddSubmit}
       />
-    </ThemedView>
+    </ScrollView>
   );
 }
 
