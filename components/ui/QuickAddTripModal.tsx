@@ -10,25 +10,40 @@ type QuickAddTripModalProps = {
   onClose: () => void;
   onSubmit: (trip: {
     date: Date;
+    origin: string;
+    destination: string;
+    transportType: string;
     cost: number;
     description?: string;
   }) => void;
 };
 
+const TRANSPORT_TYPES = ['Bus', 'Train', 'Tram', 'Subway'];
+
 export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripModalProps) {
   const [date, setDate] = useState(new Date());
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [transportType, setTransportType] = useState(TRANSPORT_TYPES[0]);
   const [cost, setCost] = useState('');
   const [description, setDescription] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTransportPicker, setShowTransportPicker] = useState(false);
 
   const handleSubmit = () => {
     onSubmit({
       date,
+      origin,
+      destination,
+      transportType,
       cost: parseFloat(cost),
       description: description.trim() || undefined,
     });
     // Reset form
     setDate(new Date());
+    setOrigin('');
+    setDestination('');
+    setTransportType(TRANSPORT_TYPES[0]);
     setCost('');
     setDescription('');
     onClose();
@@ -48,6 +63,30 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
             <TouchableOpacity onPress={onClose}>
               <IconSymbol name="xmark.circle.fill" size={24} color="#666" />
             </TouchableOpacity>
+          </View>
+
+          {/* Origin Input */}
+          <View style={styles.inputContainer}>
+            <IconSymbol name="mappin.circle.fill" size={20} color="#007AFF" />
+            <TextInput
+              style={styles.input}
+              value={origin}
+              onChangeText={setOrigin}
+              placeholder="Origin"
+              placeholderTextColor="#666"
+            />
+          </View>
+
+          {/* Destination Input */}
+          <View style={styles.inputContainer}>
+            <IconSymbol name="mappin.circle.fill" size={20} color="#007AFF" />
+            <TextInput
+              style={styles.input}
+              value={destination}
+              onChangeText={setDestination}
+              placeholder="Destination"
+              placeholderTextColor="#666"
+            />
           </View>
 
           {/* Date Picker */}
@@ -73,6 +112,42 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
                 }
               }}
             />
+          )}
+
+          {/* Transport Type Picker */}
+          <TouchableOpacity 
+            style={styles.dateButton}
+            onPress={() => setShowTransportPicker(true)}
+          >
+            <IconSymbol name="bus" size={20} color="#007AFF" />
+            <ThemedText style={styles.dateButtonText}>
+              {transportType}
+            </ThemedText>
+          </TouchableOpacity>
+
+          {showTransportPicker && (
+            <View style={styles.transportPicker}>
+              {TRANSPORT_TYPES.map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  style={[
+                    styles.transportOption,
+                    transportType === type && styles.transportOptionSelected
+                  ]}
+                  onPress={() => {
+                    setTransportType(type);
+                    setShowTransportPicker(false);
+                  }}
+                >
+                  <ThemedText style={[
+                    styles.transportOptionText,
+                    transportType === type && styles.transportOptionTextSelected
+                  ]}>
+                    {type}
+                  </ThemedText>
+                </TouchableOpacity>
+              ))}
+            </View>
           )}
 
           {/* Cost Input */}
@@ -102,9 +177,12 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
 
           {/* Submit Button */}
           <TouchableOpacity 
-            style={styles.submitButton}
+            style={[
+              styles.submitButton,
+              (!origin || !destination || !cost) && styles.submitButtonDisabled
+            ]}
             onPress={handleSubmit}
-            disabled={!cost}
+            disabled={!origin || !destination || !cost}
           >
             <ThemedText style={styles.submitButtonText}>Add Trip</ThemedText>
           </TouchableOpacity>
@@ -172,9 +250,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  submitButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
   submitButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  transportPicker: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  transportOption: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  transportOptionSelected: {
+    backgroundColor: '#f0f0f0',
+  },
+  transportOptionText: {
+    fontSize: 16,
+  },
+  transportOptionTextSelected: {
+    color: '#007AFF',
     fontWeight: '600',
   },
 }); 

@@ -11,6 +11,7 @@ import { useState } from "react";
 const initialTrips = [
   {
     id: 1,
+    origin: "Home",
     destination: "Work",
     date: "Today",
     time: "08:30",
@@ -20,6 +21,7 @@ const initialTrips = [
   },
   {
     id: 2,
+    origin: "Work",
     destination: "Gym",
     date: "Yesterday",
     time: "17:45",
@@ -29,6 +31,7 @@ const initialTrips = [
   },
   {
     id: 3,
+    origin: "Home",
     destination: "Shopping",
     date: "Mar 18",
     time: "14:20",
@@ -73,15 +76,23 @@ export default function UserScreen() {
     });
   };
 
-  const handleQuickAddSubmit = (trip: { date: Date; cost: number; description?: string }) => {
+  const handleQuickAddSubmit = (trip: { 
+    date: Date; 
+    origin: string;
+    destination: string; 
+    transportType: string; 
+    cost: number; 
+    description?: string 
+  }) => {
     const newTrip = {
       id: trips.length + 1,
-      destination: trip.description || "Quick Trip",
+      origin: trip.origin,
+      destination: trip.destination,
       date: formatDate(trip.date),
       time: formatTime(trip.date),
-      transportType: "Bus", // Default to Bus for now
+      transportType: trip.transportType,
       cost: trip.cost,
-      description: trip.description || "" // Ensure description is always a string
+      description: trip.description || ""
     };
 
     setTrips(prevTrips => [newTrip, ...prevTrips]);
@@ -123,9 +134,15 @@ export default function UserScreen() {
             onPress={() => handleTripPress(trip.id)}
           >
             <ThemedView style={styles.tripHeader}>
-              <ThemedText type="defaultSemiBold" style={styles.tripDestination}>
-                {trip.destination}
-              </ThemedText>
+              <ThemedView style={styles.tripRoute}>
+                <ThemedText type="defaultSemiBold" style={styles.tripOrigin}>
+                  {trip.origin}
+                </ThemedText>
+                <IconSymbol name="arrow.right" size={16} color="#666" style={styles.routeArrow} />
+                <ThemedText type="defaultSemiBold" style={styles.tripDestination}>
+                  {trip.destination}
+                </ThemedText>
+              </ThemedView>
               <ThemedText style={styles.tripDate}>{trip.date}</ThemedText>
             </ThemedView>
             <ThemedText style={styles.tripDescription}>{trip.description}</ThemedText>
@@ -216,8 +233,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  tripRoute: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  tripOrigin: {
+    fontSize: 16,
+    color: '#666',
+  },
   tripDestination: {
     fontSize: 18,
+  },
+  routeArrow: {
+    marginHorizontal: 8,
   },
   tripDate: {
     fontSize: 14,
