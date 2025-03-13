@@ -163,6 +163,15 @@ export default function UserScreen() {
             </ThemedView>
           </TouchableOpacity>
         ))}
+
+        {/* Add New Trip Button */}
+        <TouchableOpacity 
+          style={styles.addNewTripButton}
+          onPress={handleNewTrip}
+        >
+          <IconSymbol name="plus.circle.fill" size={24} color="#fff" />
+          <ThemedText style={styles.addNewTripButtonText}>Add New Trip</ThemedText>
+        </TouchableOpacity>
       </View>
 
       {/* Quick Add Trip Modal */}
@@ -199,6 +208,23 @@ const styles = StyleSheet.create({
   },
   addButton: {
     padding: 8,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+  },
+  addNewTripButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#007AFF',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+    gap: 8,
+  },
+  addNewTripButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   tripCard: {
     padding: 16,
