@@ -1,8 +1,7 @@
 import React from "react";
-import { View, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, ScrollView, Image } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import LoginForm from "@/components/ui/LoginForm";
-import RecentTrips from "@/components/ui/RecentTrips";
 
 export default function HomeScreen() {
 	return (
@@ -23,61 +22,34 @@ export default function HomeScreen() {
 					</View>
 				</View>
 
-				{/* Quick Actions */}
-				<View className="flex-row justify-around py-4 bg-white dark:bg-gray-800">
-					<TouchableOpacity className="items-center">
-						<View className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center mb-2">
-							<ThemedText className="text-blue-500 dark:text-blue-300 text-xl">✈️</ThemedText>
-						</View>
-						<ThemedText className="text-sm">Book Flight</ThemedText>
-					</TouchableOpacity>
-					<TouchableOpacity className="items-center">
-						<View className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center mb-2">
-							<ThemedText className="text-blue-500 dark:text-blue-300 text-xl">🏨</ThemedText>
-						</View>
-						<ThemedText className="text-sm">Hotels</ThemedText>
-					</TouchableOpacity>
-					<TouchableOpacity className="items-center">
-						<View className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center mb-2">
-							<ThemedText className="text-blue-500 dark:text-blue-300 text-xl">🎫</ThemedText>
-						</View>
-						<ThemedText className="text-sm">Activities</ThemedText>
-					</TouchableOpacity>
-				</View>
-
-				{/* Recent Trips Section */}
-				<View className="px-4 py-6">
-					<RecentTrips />
-				</View>
-
 				{/* Login Form Section */}
 				<View className="px-4 py-6">
 					<LoginForm />
 				</View>
 
 				{/* Feature Highlights */}
-				<View className="px-4 py-6 bg-white dark:bg-gray-800">
-					<ThemedText type="title" className="text-center mb-6">
+				<View className="px-4 py-6">
+					<ThemedText type="subtitle" className="text-center mb-6">
 						Why Choose TravelApp?
 					</ThemedText>
 					<View className="space-y-4">
-						<View className="flex-row items-center space-x-3">
-							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center">
+						<View className="flex-row items-center">
+							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center mr-3">
 								<ThemedText className="text-blue-500 dark:text-blue-300">✓</ThemedText>
 							</View>
-							<ThemedText>Personalized travel recommendations</ThemedText>
+							<ThemedText>Track your travel history</ThemedText>
 						</View>
-						<View className="flex-row items-center space-x-3">
-							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center">
+						<View className="flex-row items-center">
+							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center mr-3">
 								<ThemedText className="text-blue-500 dark:text-blue-300">✓</ThemedText>
 							</View>
-							<ThemedText>Local insights and tips</ThemedText>
+							<ThemedText>Plan future adventures</ThemedText>
 						</View>
-						<View className="flex-row items-center space-x-3">
-							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center">
+						<View className="flex-row items-center">
+							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center mr-3">
 								<ThemedText className="text-blue-500 dark:text-blue-300">✓</ThemedText>
 							</View>
-							<ThemedText>Offline access to travel guides</ThemedText>
+							<ThemedText>Share travel experiences</ThemedText>
 						</View>
 					</View>
 				</View>
