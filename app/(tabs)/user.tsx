@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, ScrollView, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -6,6 +6,16 @@ import { router } from "expo-router";
 import { FinancialOverview } from "@/components/ui/FinancialOverview";
 import { QuickAddTripModal } from "@/components/ui/QuickAddTripModal";
 import { useState } from "react";
+
+type Trip = {
+  id: string;
+  date: Date;
+  origin: string;
+  destination: string;
+  transportType: string;
+  cost: number;
+  description: string;
+};
 
 // Initial dummy data for trips
 const initialTrips = [
@@ -42,11 +52,11 @@ const initialTrips = [
 ];
 
 export default function UserScreen() {
-  const [trips, setTrips] = useState(initialTrips);
-  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [trips, setTrips] = useState<Trip[]>([]);
 
   const handleNewTrip = () => {
-    setShowQuickAddModal(true);
+    setShowQuickAdd(true);
   };
 
   const handleTripPress = (tripId: number) => {
@@ -76,98 +86,87 @@ export default function UserScreen() {
     });
   };
 
-  const handleQuickAddSubmit = (trip: { 
-    date: Date; 
+  const handleQuickAddSubmit = (trip: {
+    date: Date;
     origin: string;
-    destination: string; 
-    transportType: string; 
-    cost: number; 
-    description?: string 
+    destination: string;
+    transportType: string;
+    cost: number;
+    description?: string;
   }) => {
-    const newTrip = {
-      id: trips.length + 1,
+    const newTrip: Trip = {
+      id: Date.now().toString(),
+      date: trip.date,
       origin: trip.origin,
       destination: trip.destination,
-      date: formatDate(trip.date),
-      time: formatTime(trip.date),
       transportType: trip.transportType,
       cost: trip.cost,
-      description: trip.description || ""
+      description: trip.description || '',
     };
-
-    setTrips(prevTrips => [newTrip, ...prevTrips]);
+    setTrips([newTrip, ...trips]);
   };
 
-  // Calculate statistics
-  const totalTrips = trips.length;
+  // Calculate total cost from all trips
   const totalCost = trips.reduce((sum, trip) => sum + trip.cost, 0);
 
   return (
     <ScrollView style={styles.container}>
-      <ThemedView style={styles.header}>
-        <ThemedText type="title" style={styles.headerTitle}>
-          My Climate Journey
-        </ThemedText>
-        <ThemedText style={styles.headerSubtitle}>
-          Track your impact and savings
-        </ThemedText>
-      </ThemedView>
+      <View style={styles.header}>
+        <ThemedText type="title">My Climate Journey</ThemedText>
+        <ThemedText style={styles.subtitle}>Track your impact and savings</ThemedText>
+      </View>
 
-      {/* Financial Overview */}
-      <FinancialOverview totalTrips={totalTrips} timeFrame="year" />
+      <FinancialOverview 
+        totalTrips={trips.length}
+        timeFrame="year"
+        totalCost={totalCost}
+      />
 
       {/* Recent Trips */}
-      <ThemedView style={styles.section}>
-        <ThemedView style={styles.sectionHeader}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Recent Trips
-          </ThemedText>
-          <TouchableOpacity style={styles.newTripButton} onPress={handleNewTrip}>
-            <IconSymbol name="paperplane.fill" size={20} color="#fff" />
-            <ThemedText style={styles.newTripButtonText}>New Trip</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-        {trips.map((trip) => (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <ThemedText type="subtitle">Recent Trips</ThemedText>
           <TouchableOpacity 
-            key={trip.id} 
-            style={styles.tripCard}
-            onPress={() => handleTripPress(trip.id)}
+            style={styles.addButton}
+            onPress={handleNewTrip}
           >
-            <ThemedView style={styles.tripHeader}>
-              <ThemedView style={styles.tripRoute}>
-                <ThemedText type="defaultSemiBold" style={styles.tripOrigin}>
-                  {trip.origin}
-                </ThemedText>
-                <IconSymbol name="arrow.right" size={16} color="#666" style={styles.routeArrow} />
-                <ThemedText type="defaultSemiBold" style={styles.tripDestination}>
-                  {trip.destination}
-                </ThemedText>
-              </ThemedView>
-              <ThemedText style={styles.tripDate}>{trip.date}</ThemedText>
-            </ThemedView>
-            <ThemedText style={styles.tripDescription}>{trip.description}</ThemedText>
-            <ThemedView style={styles.tripDetails}>
-              <ThemedView style={styles.tripDetail}>
-                <ThemedText style={styles.tripDetailLabel}>Time</ThemedText>
-                <ThemedText style={styles.tripDetailValue}>{trip.time}</ThemedText>
-              </ThemedView>
-              <ThemedView style={styles.tripDetail}>
-                <ThemedText style={styles.tripDetailLabel}>Transport</ThemedText>
-                <ThemedText style={styles.tripDetailValue}>{trip.transportType}</ThemedText>
-              </ThemedView>
-              <ThemedView style={styles.tripDetail}>
-                <ThemedText style={styles.tripDetailLabel}>Cost</ThemedText>
-                <ThemedText style={styles.tripDetailValue}>€{trip.cost.toFixed(2)}</ThemedText>
-              </ThemedView>
-            </ThemedView>
+            <IconSymbol name="plus.circle.fill" size={24} color="#007AFF" />
           </TouchableOpacity>
+        </View>
+
+        {trips.map((trip) => (
+          <ThemedView key={trip.id} style={styles.tripCard}>
+            <View style={styles.tripHeader}>
+              <View>
+                <ThemedText style={styles.tripTitle}>
+                  {trip.origin} → {trip.destination}
+                </ThemedText>
+                <ThemedText style={styles.tripDate}>
+                  {trip.date.toLocaleDateString()} {trip.date.toLocaleTimeString()}
+                </ThemedText>
+              </View>
+              <ThemedText style={styles.tripCost}>€{trip.cost.toFixed(2)}</ThemedText>
+            </View>
+            <View style={styles.tripDetails}>
+              <View style={styles.tripDetail}>
+                <IconSymbol name="bus" size={16} color="#666" />
+                <ThemedText style={styles.tripDetailText}>{trip.transportType}</ThemedText>
+              </View>
+              {trip.description && (
+                <View style={styles.tripDetail}>
+                  <IconSymbol name="text.bubble" size={16} color="#666" />
+                  <ThemedText style={styles.tripDetailText}>{trip.description}</ThemedText>
+                </View>
+              )}
+            </View>
+          </ThemedView>
         ))}
-      </ThemedView>
+      </View>
 
       {/* Quick Add Trip Modal */}
       <QuickAddTripModal
-        visible={showQuickAddModal}
-        onClose={() => setShowQuickAddModal(false)}
+        visible={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
         onSubmit={handleQuickAddSubmit}
       />
     </ScrollView>
@@ -177,21 +176,18 @@ export default function UserScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
   },
   header: {
-    padding: 20,
-    paddingTop: 40,
+    marginBottom: 20,
   },
-  headerTitle: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
-  headerSubtitle: {
+  subtitle: {
     fontSize: 16,
-    opacity: 0.7,
+    color: '#666',
+    marginTop: 4,
   },
   section: {
-    padding: 20,
+    marginTop: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -199,28 +195,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 20,
-  },
-  newTripButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  newTripButtonText: {
-    color: '#fff',
-    marginLeft: 6,
-    fontSize: 14,
-    fontWeight: '600',
+  addButton: {
+    padding: 8,
   },
   tripCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -230,50 +212,35 @@ const styles = StyleSheet.create({
   tripHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
-  tripRoute: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  tripOrigin: {
+  tripTitle: {
     fontSize: 16,
-    color: '#666',
-  },
-  tripDestination: {
-    fontSize: 18,
-  },
-  routeArrow: {
-    marginHorizontal: 8,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   tripDate: {
     fontSize: 14,
-    opacity: 0.7,
+    color: '#666',
   },
-  tripDescription: {
-    fontSize: 14,
-    opacity: 0.7,
-    marginBottom: 12,
+  tripCost: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#007AFF',
   },
   tripDetails: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 12,
+    flexWrap: 'wrap',
+    gap: 12,
   },
   tripDetail: {
-    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
-  tripDetailLabel: {
-    fontSize: 12,
-    opacity: 0.7,
-    marginBottom: 4,
-  },
-  tripDetailValue: {
+  tripDetailText: {
     fontSize: 14,
-    fontWeight: '600',
+    color: '#666',
   },
 }); 

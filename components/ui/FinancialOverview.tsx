@@ -1,23 +1,29 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-
-// Constants
-const KLIMATICKET_PRICE = 1297.80;
-const SINGLE_TRIP_PRICE = 2.50;
+import Svg, { Circle } from 'react-native-svg';
 
 type FinancialOverviewProps = {
   totalTrips: number;
-  timeFrame: 'week' | 'month' | 'year';
+  timeFrame: string;
+  totalCost: number;
 };
 
-export function FinancialOverview({ totalTrips, timeFrame }: FinancialOverviewProps) {
-  const totalValue = totalTrips * SINGLE_TRIP_PRICE;
-  const percentage = Math.min((totalValue / KLIMATICKET_PRICE) * 100, 100);
-  const remainingValue = Math.max(KLIMATICKET_PRICE - totalValue, 0);
-  const tripsNeeded = Math.ceil(KLIMATICKET_PRICE / SINGLE_TRIP_PRICE);
+const KLIMATICKET_PRICE = 1297.80;
+const CIRCLE_SIZE = 200;
+const CIRCLE_STROKE_WIDTH = 20;
+const CIRCLE_RADIUS = (CIRCLE_SIZE - CIRCLE_STROKE_WIDTH) / 2;
+const CIRCLE_CENTER = CIRCLE_SIZE / 2;
+
+export function FinancialOverview({ totalTrips, timeFrame, totalCost }: FinancialOverviewProps) {
+  const percentage = Math.min((totalCost / KLIMATICKET_PRICE) * 100, 100);
+  const remainingValue = Math.max(KLIMATICKET_PRICE - totalCost, 0);
+  const tripsNeeded = Math.ceil(remainingValue / 2.50);
+
+  const circumference = 2 * Math.PI * CIRCLE_RADIUS;
+  const progressOffset = circumference - (percentage / 100) * circumference;
 
   return (
     <ThemedView style={styles.container}>
@@ -25,44 +31,63 @@ export function FinancialOverview({ totalTrips, timeFrame }: FinancialOverviewPr
         Financial Overview
       </ThemedText>
 
-      {/* Progress Wheel */}
       <View style={styles.progressContainer}>
-        <View style={[styles.progressWheel, { transform: [{ rotate: `${percentage * 3.6}deg` }] }]}>
-          <View style={styles.progressInner}>
-            <ThemedText type="defaultSemiBold" style={styles.percentageText}>
-              {Math.round(percentage)}%
-            </ThemedText>
-            <ThemedText style={styles.subText}>of ticket value</ThemedText>
-          </View>
+        <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
+          <Circle
+            cx={CIRCLE_CENTER}
+            cy={CIRCLE_CENTER}
+            r={CIRCLE_RADIUS}
+            stroke="#E5E7EB"
+            strokeWidth={CIRCLE_STROKE_WIDTH}
+          />
+          <Circle
+            cx={CIRCLE_CENTER}
+            cy={CIRCLE_CENTER}
+            r={CIRCLE_RADIUS}
+            stroke="#007AFF"
+            strokeWidth={CIRCLE_STROKE_WIDTH}
+            strokeDasharray={circumference}
+            strokeDashoffset={progressOffset}
+            strokeLinecap="round"
+            transform={`rotate(-90 ${CIRCLE_CENTER} ${CIRCLE_CENTER})`}
+          />
+        </Svg>
+        <View style={styles.progressText}>
+          <ThemedText type="title" style={styles.percentageText}>
+            {Math.round(percentage)}%
+          </ThemedText>
+          <ThemedText style={styles.progressSubtext}>
+            of KlimaTicket Ö
+          </ThemedText>
         </View>
       </View>
 
-      {/* Statistics */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <IconSymbol name="paperplane.fill" size={24} color="#007AFF" />
-          <ThemedText style={styles.statValue}>€{totalValue.toFixed(2)}</ThemedText>
+          <IconSymbol name="eurosign.circle.fill" size={24} color="#007AFF" />
+          <ThemedText style={styles.statValue}>€{totalCost.toFixed(2)}</ThemedText>
           <ThemedText style={styles.statLabel}>Total Value</ThemedText>
         </View>
+
         <View style={styles.statItem}>
-          <IconSymbol name="house.fill" size={24} color="#007AFF" />
+          <IconSymbol name="bus" size={24} color="#007AFF" />
           <ThemedText style={styles.statValue}>{totalTrips}</ThemedText>
           <ThemedText style={styles.statLabel}>Total Trips</ThemedText>
         </View>
+
         <View style={styles.statItem}>
-          <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color="#007AFF" />
+          <IconSymbol name="arrow.down.circle.fill" size={24} color="#007AFF" />
           <ThemedText style={styles.statValue}>€{remainingValue.toFixed(2)}</ThemedText>
           <ThemedText style={styles.statLabel}>Remaining</ThemedText>
         </View>
       </View>
 
-      {/* Additional Info */}
       <View style={styles.infoContainer}>
         <ThemedText style={styles.infoText}>
-          You need {tripsNeeded} trips to break even with the KlimaTicket Ö
+          {tripsNeeded} more trips needed to break even
         </ThemedText>
-        <ThemedText style={styles.infoText}>
-          Current timeframe: {timeFrame}
+        <ThemedText style={styles.timeFrameText}>
+          Based on trips in the last {timeFrame}
         </ThemedText>
       </View>
     </ThemedView>
@@ -84,30 +109,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  progressWheel: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
+  progressText: {
+    position: 'absolute',
     alignItems: 'center',
-  },
-  progressInner: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    backgroundColor: '#fff',
     justifyContent: 'center',
-    alignItems: 'center',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   percentageText: {
-    fontSize: 24,
-    color: '#007AFF',
+    fontSize: 36,
+    fontWeight: 'bold',
   },
-  subText: {
-    fontSize: 12,
+  progressSubtext: {
+    fontSize: 14,
     color: '#666',
-    marginTop: 4,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -115,28 +132,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statItem: {
-    flex: 1,
     alignItems: 'center',
-    marginHorizontal: 5,
+    flex: 1,
   },
   statValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    marginTop: 8,
+    marginTop: 4,
   },
   statLabel: {
     fontSize: 12,
-    opacity: 0.7,
-    marginTop: 4,
+    color: '#666',
+    marginTop: 2,
   },
   infoContainer: {
-    backgroundColor: '#f5f5f5',
-    padding: 15,
-    borderRadius: 8,
+    alignItems: 'center',
   },
   infoText: {
     fontSize: 14,
+    color: '#666',
     textAlign: 'center',
-    marginBottom: 5,
+  },
+  timeFrameText: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
   },
 }); 
