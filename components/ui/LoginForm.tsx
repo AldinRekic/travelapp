@@ -102,8 +102,8 @@ export default function LoginForm() {
           email: user.email,
         }));
 
-        // Navigate to explore page after successful login
-        router.push("/explore");
+        // Navigate to user page after successful login
+        router.push("/(tabs)/user");
       } else {
         // Increment failed attempts
         setAttempts(prev => prev + 1);
