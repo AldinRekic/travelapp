@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, View, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { Modal, View, StyleSheet, TouchableOpacity, TextInput, Platform, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 type QuickAddTripModalProps = {
   visible: boolean;
@@ -49,28 +48,71 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
     onClose();
   };
 
-  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowDatePicker(false);
+  const handleDateChange = (newDate: Date) => {
+    setDate(newDate);
+    setShowDatePicker(false);
+  };
+
+  const renderDatePicker = () => {
+    if (!showDatePicker) return null;
+
+    const today = new Date();
+    const dates: Date[] = [];
+    
+    // Generate dates for the next 7 days
+    for (let i = 0; i < 7; i++) {
+      const newDate = new Date(today);
+      newDate.setDate(today.getDate() + i);
+      dates.push(newDate);
     }
-    if (selectedDate) {
-      setDate(selectedDate);
-    }
+
+    return (
+      <Modal
+        visible={showDatePicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowDatePicker(false)}
+      >
+        <View style={styles.datePickerOverlay}>
+          <ThemedView style={styles.datePickerContent}>
+            <View style={styles.datePickerHeader}>
+              <ThemedText type="subtitle">Select Date</ThemedText>
+              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                <IconSymbol name="xmark.circle.fill" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.datePickerList}>
+              {dates.map((d) => (
+                <TouchableOpacity
+                  key={d.toISOString()}
+                  style={[
+                    styles.dateOption,
+                    d.toDateString() === date.toDateString() && styles.dateOptionSelected
+                  ]}
+                  onPress={() => handleDateChange(d)}
+                >
+                  <ThemedText style={[
+                    styles.dateOptionText,
+                    d.toDateString() === date.toDateString() && styles.dateOptionTextSelected
+                  ]}>
+                    {d.toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </ThemedText>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </ThemedView>
+        </View>
+      </Modal>
+    );
   };
 
   return (
     <>
-      {/* Date Picker rendered outside Modal */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="datetime"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleDateChange}
-        />
-      )}
-
-      {/* Main Modal */}
+      {renderDatePicker()}
       <Modal
         visible={visible}
         transparent
@@ -117,7 +159,11 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
             >
               <IconSymbol name="calendar" size={20} color="#007AFF" />
               <ThemedText style={styles.dateButtonText}>
-                {date.toLocaleString()}
+                {date.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
               </ThemedText>
             </TouchableOpacity>
 
@@ -285,6 +331,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   transportOptionTextSelected: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  datePickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  datePickerContent: {
+    width: '90%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  datePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  datePickerList: {
+    maxHeight: 300,
+  },
+  dateOption: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  dateOptionSelected: {
+    backgroundColor: '#f0f0f0',
+  },
+  dateOptionText: {
+    fontSize: 16,
+  },
+  dateOptionTextSelected: {
     color: '#007AFF',
     fontWeight: '600',
   },
