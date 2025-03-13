@@ -4,12 +4,14 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import Svg, { Circle } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 
-type FinancialOverviewProps = {
+interface FinancialOverviewProps {
   totalTrips: number;
-  timeFrame: string;
+  totalDistance: number;
   totalCost: number;
-};
+  klimaTicketCost: number;
+}
 
 const KLIMATICKET_PRICE = 1297.80;
 const CIRCLE_SIZE = 200;
@@ -17,7 +19,10 @@ const CIRCLE_STROKE_WIDTH = 20;
 const CIRCLE_RADIUS = (CIRCLE_SIZE - CIRCLE_STROKE_WIDTH) / 2;
 const CIRCLE_CENTER = CIRCLE_SIZE / 2;
 
-export function FinancialOverview({ totalTrips, timeFrame, totalCost }: FinancialOverviewProps) {
+export function FinancialOverview({ totalTrips, totalDistance, totalCost, klimaTicketCost }: FinancialOverviewProps) {
+  const savings = klimaTicketCost - totalCost;
+  const savingsPercentage = ((savings / klimaTicketCost) * 100).toFixed(1);
+
   const percentage = Math.min((totalCost / KLIMATICKET_PRICE) * 100, 100);
   const remainingValue = Math.max(KLIMATICKET_PRICE - totalCost, 0);
   const tripsNeeded = Math.ceil(remainingValue / 2.50);
@@ -26,10 +31,40 @@ export function FinancialOverview({ totalTrips, timeFrame, totalCost }: Financia
   const progressOffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="subtitle" style={styles.title}>
-        Financial Overview
-      </ThemedText>
+    <LinearGradient
+      colors={['#4F46E5', '#7C3AED']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className="rounded-2xl p-4 mb-4"
+    >
+      <ThemedText className="text-white text-lg font-bold mb-2">Financial Overview</ThemedText>
+      
+      <View className="flex-row justify-between mb-2">
+        <ThemedText className="text-white/80">Total Trips</ThemedText>
+        <ThemedText className="text-white font-semibold">{totalTrips}</ThemedText>
+      </View>
+      
+      <View className="flex-row justify-between mb-2">
+        <ThemedText className="text-white/80">Total Distance</ThemedText>
+        <ThemedText className="text-white font-semibold">{totalDistance} km</ThemedText>
+      </View>
+      
+      <View className="flex-row justify-between mb-2">
+        <ThemedText className="text-white/80">Total Cost</ThemedText>
+        <ThemedText className="text-white font-semibold">€{totalCost.toFixed(2)}</ThemedText>
+      </View>
+      
+      <View className="flex-row justify-between mb-2">
+        <ThemedText className="text-white/80">KlimaTicket Ö Cost</ThemedText>
+        <ThemedText className="text-white font-semibold">€{klimaTicketCost.toFixed(2)}</ThemedText>
+      </View>
+      
+      <View className="flex-row justify-between mt-2 pt-2 border-t border-white/20">
+        <ThemedText className="text-white font-bold">Total Savings</ThemedText>
+        <ThemedText className="text-green-400 font-bold">
+          €{savings.toFixed(2)} ({savingsPercentage}%)
+        </ThemedText>
+      </View>
 
       <View style={styles.progressContainer}>
         <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
@@ -87,10 +122,10 @@ export function FinancialOverview({ totalTrips, timeFrame, totalCost }: Financia
           {tripsNeeded} more trips needed to break even
         </ThemedText>
         <ThemedText style={styles.timeFrameText}>
-          Based on trips in the last {timeFrame}
+          Based on trips in the last {totalDistance} km
         </ThemedText>
       </View>
-    </ThemedView>
+    </LinearGradient>
   );
 }
 

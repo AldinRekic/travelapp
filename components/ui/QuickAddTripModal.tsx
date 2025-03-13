@@ -3,6 +3,7 @@ import { Modal, View, StyleSheet, TouchableOpacity, TextInput, Platform, ScrollV
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 type QuickAddTripModalProps = {
   visible: boolean;
@@ -14,6 +15,7 @@ type QuickAddTripModalProps = {
     transportType: string;
     cost: number;
     description?: string;
+    distance: number;
   }) => void;
 };
 
@@ -26,10 +28,15 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
   const [transportType, setTransportType] = useState(TRANSPORT_TYPES[0]);
   const [cost, setCost] = useState('');
   const [description, setDescription] = useState('');
+  const [distance, setDistance] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTransportPicker, setShowTransportPicker] = useState(false);
 
   const handleSubmit = () => {
+    if (!origin || !destination || !transportType || !cost || !distance) {
+      return;
+    }
+
     onSubmit({
       date,
       origin,
@@ -37,6 +44,7 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
       transportType,
       cost: parseFloat(cost),
       description: description.trim() || undefined,
+      distance: parseFloat(distance),
     });
     // Reset form
     setDate(new Date());
@@ -45,12 +53,15 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
     setTransportType(TRANSPORT_TYPES[0]);
     setCost('');
     setDescription('');
+    setDistance('');
     onClose();
   };
 
-  const handleDateChange = (newDate: Date) => {
-    setDate(newDate);
-    setShowDatePicker(false);
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === "ios");
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
   };
 
   const renderDatePicker = () => {
@@ -89,7 +100,7 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
                     styles.dateOption,
                     d.toDateString() === date.toDateString() && styles.dateOptionSelected
                   ]}
-                  onPress={() => handleDateChange(d)}
+                  onPress={() => handleDateChange(null, d)}
                 >
                   <ThemedText style={[
                     styles.dateOptionText,
@@ -167,6 +178,15 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
               </ThemedText>
             </TouchableOpacity>
 
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="datetime"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={handleDateChange}
+              />
+            )}
+
             {/* Transport Type Picker */}
             <TouchableOpacity 
               style={styles.dateButton}
@@ -216,6 +236,19 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
               />
             </View>
 
+            {/* Distance Input */}
+            <View style={styles.inputContainer}>
+              <IconSymbol name="ruler" size={20} color="#007AFF" />
+              <TextInput
+                style={styles.input}
+                value={distance}
+                onChangeText={setDistance}
+                placeholder="Distance (km)"
+                keyboardType="numeric"
+                placeholderTextColor="#666"
+              />
+            </View>
+
             {/* Description Input */}
             <View style={styles.inputContainer}>
               <IconSymbol name="text.bubble" size={20} color="#007AFF" />
@@ -232,10 +265,10 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
             <TouchableOpacity 
               style={[
                 styles.submitButton,
-                (!origin || !destination || !cost) && styles.submitButtonDisabled
+                (!origin || !destination || !cost || !distance) && styles.submitButtonDisabled
               ]}
               onPress={handleSubmit}
-              disabled={!origin || !destination || !cost}
+              disabled={!origin || !destination || !cost || !distance}
             >
               <ThemedText style={styles.submitButtonText}>Add Trip</ThemedText>
             </TouchableOpacity>
