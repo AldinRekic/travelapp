@@ -4,6 +4,8 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { router } from "expo-router";
 import { FinancialOverview } from "@/components/ui/FinancialOverview";
+import { QuickAddTripModal } from "@/components/ui/QuickAddTripModal";
+import { useState } from "react";
 
 // Dummy data for trips
 const recentTrips = [
@@ -41,12 +43,19 @@ const totalTrips = recentTrips.length;
 const totalCost = recentTrips.reduce((sum, trip) => sum + trip.cost, 0);
 
 export default function UserScreen() {
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+
   const handleNewTrip = () => {
-    router.push("/(tabs)/new-trip" as any);
+    setShowQuickAddModal(true);
   };
 
   const handleTripPress = (tripId: number) => {
     router.push(`/(tabs)/trip/${tripId}` as any);
+  };
+
+  const handleQuickAddSubmit = (trip: { date: Date; cost: number; description?: string }) => {
+    // TODO: Implement actual trip creation
+    console.log('New trip:', trip);
   };
 
   return (
@@ -104,6 +113,13 @@ export default function UserScreen() {
           </TouchableOpacity>
         ))}
       </ThemedView>
+
+      {/* Quick Add Trip Modal */}
+      <QuickAddTripModal
+        visible={showQuickAddModal}
+        onClose={() => setShowQuickAddModal(false)}
+        onSubmit={handleQuickAddSubmit}
+      />
     </ScrollView>
   );
 }
