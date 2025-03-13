@@ -1,8 +1,8 @@
-import { Image, StyleSheet, Platform } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import RegisterForm from "@/components/ui/RegisterForm";
+import LoginForm from "@/components/ui/LoginForm";
 
 export default function HomeScreen() {
 	return (
@@ -23,7 +23,7 @@ export default function HomeScreen() {
 					Your journey begins here
 				</ThemedText>
 
-				<RegisterForm />
+				<LoginForm />
 
 				<ThemedView className="mt-8 space-y-4">
 					<ThemedText type="subtitle" className="text-center">
