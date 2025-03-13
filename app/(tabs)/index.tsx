@@ -1,10 +1,7 @@
 import { Image, StyleSheet, Platform } from "react-native";
-
-import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { Text } from "react-native-reanimated/lib/typescript/Animated";
 import RegisterForm from "@/components/ui/RegisterForm";
 
 export default function HomeScreen() {
@@ -18,61 +15,51 @@ export default function HomeScreen() {
 				/>
 			}
 		>
-			<RegisterForm></RegisterForm>
-			<ThemedView style={styles.titleContainer}>
-				<ThemedText type="title" className="bg-green-500">
-					!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			<ThemedView className="px-4 py-6">
+				<ThemedText type="title" className="text-center mb-6">
+					Welcome to TravelApp
 				</ThemedText>
-				<HelloWave />
-			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle" className="bg-black font-bold">
-					Step 1: Try it
+				<ThemedText type="subtitle" className="text-center mb-8">
+					Your journey begins here
 				</ThemedText>
-				<ThemedText type="default">TESTING</ThemedText>
-				<ThemedText>
-					Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-					Press{" "}
-					<ThemedText type="defaultSemiBold">
-						{Platform.select({
-							ios: "cmd + d",
-							android: "cmd + m",
-							web: "F12",
-						})}
-					</ThemedText>{" "}
-					to open developer tools.
-				</ThemedText>
-			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle">Step 2: Explore</ThemedText>
-				<ThemedText>
-					Tap the Explore tab to learn more about what's included in this starter app.
-				</ThemedText>
-			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-				<ThemedText>
-					When you're ready, run{" "}
-					<ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{" "}
-					<ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{" "}
-					<ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-					<ThemedText type="defaultSemiBold">app-example</ThemedText>.
-				</ThemedText>
+
+				<RegisterForm />
+
+				<ThemedView className="mt-8 space-y-4">
+					<ThemedText type="subtitle" className="text-center">
+						Why Choose TravelApp?
+					</ThemedText>
+					
+					<ThemedView className="space-y-3">
+						<FeatureItem 
+							title="Plan Your Trips"
+							description="Create detailed itineraries and organize your travel plans"
+						/>
+						<FeatureItem 
+							title="Discover Destinations"
+							description="Explore new places and get inspired for your next adventure"
+						/>
+						<FeatureItem 
+							title="Share Experiences"
+							description="Connect with fellow travelers and share your journey"
+						/>
+					</ThemedView>
+				</ThemedView>
 			</ThemedView>
 		</ParallaxScrollView>
 	);
 }
 
+function FeatureItem({ title, description }: { title: string; description: string }) {
+	return (
+		<ThemedView className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+			<ThemedText type="defaultSemiBold" className="mb-1">{title}</ThemedText>
+			<ThemedText type="default" className="text-gray-600 dark:text-gray-300">{description}</ThemedText>
+		</ThemedView>
+	);
+}
+
 const styles = StyleSheet.create({
-	titleContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 8,
-	},
-	stepContainer: {
-		gap: 8,
-		marginBottom: 8,
-	},
 	reactLogo: {
 		height: 178,
 		width: 290,

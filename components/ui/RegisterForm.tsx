@@ -1,95 +1,154 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { View, Text, TextInput, Button, StyleSheet, SafeAreaView } from "react-native";
-
+import { View, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator } from "react-native";
+import { ThemedText } from "@/components/ThemedText";
 import { createClient } from "@supabase/supabase-js";
+import Constants from "expo-constants";
 
-const supabaseUrl = "https://xeliynvlkfkpkrhiuxlt.supabase.co";
-const supabaseKey =
-	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbGl5bnZsa2ZrcGtyaGl1eGx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxMDcyMjcsImV4cCI6MjA0OTY4MzIyN30.sq2UxnjHtIEK84XwVtw5_Q0z7oX1qSe7hptbpi8QU6A";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+	Constants.expoConfig?.extra?.supabaseUrl ?? "",
+	Constants.expoConfig?.extra?.supabaseAnonKey ?? ""
+);
 
-async function signUpNewUser() {
-	const { data, error } = await supabase.auth.signUp({
-		email: "valid.email@supabase.io",
-		password: "example-password",
-		options: {
-			emailRedirectTo: "https://example.com/welcome",
-		},
-	});
-}
+type FormData = {
+	name: string;
+	email: string;
+	password: string;
+};
 
-
-function MyForm() {
+export default function RegisterForm() {
 	const {
 		control,
 		handleSubmit,
-		formState: { errors },
-	} = useForm();
-	const [submittedData, setSubmittedData] = useState(null);
+		formState: { errors, isSubmitting },
+		reset,
+	} = useForm<FormData>();
+	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState(false);
 
-	const onSubmit = (data: any) => {
-		console.log("Submitted Data:", data);
-		setSubmittedData(data);
+	const onSubmit = async (data: FormData) => {
+		try {
+			setError(null);
+			const { error: signUpError } = await supabase.auth.signUp({
+				email: data.email,
+				password: data.password,
+				options: {
+					data: {
+						name: data.name,
+					},
+				},
+			});
+
+			if (signUpError) throw signUpError;
+
+			setSuccess(true);
+			reset();
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "An error occurred during registration");
+		}
 	};
 
-	useEffect(() => {
-		signUpNewUser();
-	}, []);
-
 	return (
-		<SafeAreaView>
-			<View style={styles.container}>
-				<Controller
-					control={control}
-					render={({ field }) => (
-						<TextInput {...field} style={styles.input} placeholder="Your Name" />
-					)}
-					name="name"
-					rules={{ required: "You must enter your name" }}
-				/>
-				{errors.name && <Text style={styles.errorText}>{errors.name.message?.toString()}</Text>}
+		<SafeAreaView className="w-full px-4 py-6">
+			<View className="space-y-4">
+				<ThemedText type="title" className="text-center mb-6">
+					Create Account
+				</ThemedText>
 
 				<Controller
 					control={control}
-					render={({ field }) => <TextInput {...field} style={styles.input} placeholder="Email" />}
+					name="name"
+					rules={{ required: "Name is required" }}
+					render={({ field: { onChange, value } }) => (
+						<View>
+							<TextInput
+								className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
+								placeholder="Your Name"
+								placeholderTextColor="#9CA3AF"
+								onChangeText={onChange}
+								value={value}
+							/>
+							{errors.name && (
+								<ThemedText className="text-red-500 text-sm mt-1">{errors.name.message}</ThemedText>
+							)}
+						</View>
+					)}
+				/>
+
+				<Controller
+					control={control}
 					name="email"
 					rules={{
-						required: "You must enter your email",
-						pattern: { value: /^\S+@\S+$/i, message: "Enter a valid email address" },
+						required: "Email is required",
+						pattern: {
+							value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+							message: "Invalid email address",
+						},
 					}}
+					render={({ field: { onChange, value } }) => (
+						<View>
+							<TextInput
+								className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
+								placeholder="Email"
+								placeholderTextColor="#9CA3AF"
+								keyboardType="email-address"
+								autoCapitalize="none"
+								onChangeText={onChange}
+								value={value}
+							/>
+							{errors.email && (
+								<ThemedText className="text-red-500 text-sm mt-1">{errors.email.message}</ThemedText>
+							)}
+						</View>
+					)}
 				/>
-				{errors.email && <Text style={styles.errorText}>{errors.email.message?.toString()}</Text>}
 
-				<Button title="Submit" onPress={handleSubmit(onSubmit)} />
-				{/* 
-				{submittedData && (
-					<View style={styles.submittedContainer}>
-						<Text style={styles.submittedTitle}>Submitted Data:</Text>
-						<Text>Name: {submittedData.name}</Text>
-						<Text>Email: {submittedData.email}</Text>
-					</View>
-				)} */}
+				<Controller
+					control={control}
+					name="password"
+					rules={{
+						required: "Password is required",
+						minLength: {
+							value: 6,
+							message: "Password must be at least 6 characters",
+						},
+					}}
+					render={({ field: { onChange, value } }) => (
+						<View>
+							<TextInput
+								className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
+								placeholder="Password"
+								placeholderTextColor="#9CA3AF"
+								secureTextEntry
+								onChangeText={onChange}
+								value={value}
+							/>
+							{errors.password && (
+								<ThemedText className="text-red-500 text-sm mt-1">{errors.password.message}</ThemedText>
+							)}
+						</View>
+					)}
+				/>
+
+				{error && <ThemedText className="text-red-500 text-sm text-center">{error}</ThemedText>}
+				{success && (
+					<ThemedText className="text-green-500 text-sm text-center">
+						Registration successful! Please check your email to verify your account.
+					</ThemedText>
+				)}
+
+				<TouchableOpacity
+					className="bg-blue-500 rounded-lg py-3 px-4 mt-4"
+					onPress={handleSubmit(onSubmit)}
+					disabled={isSubmitting}
+				>
+					{isSubmitting ? (
+						<ActivityIndicator color="white" />
+					) : (
+						<ThemedText className="text-white text-center font-semibold">Register</ThemedText>
+					)}
+				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		padding: 16,
-	},
-	input: {
-		height: 40,
-		borderColor: "gray",
-		borderWidth: 1,
-		marginBottom: 10,
-		padding: 8,
-	},
-	errorText: {
-		color: "red",
-		marginBottom: 10,
-	},
-});
-
-export default MyForm;
