@@ -18,33 +18,30 @@ type Trip = {
 };
 
 // Initial dummy data for trips
-const initialTrips = [
+const initialTrips: Trip[] = [
   {
-    id: 1,
+    id: "1",
     origin: "Home",
     destination: "Work",
-    date: "Today",
-    time: "08:30",
+    date: new Date(),
     transportType: "Bus",
     cost: 2.50,
     description: "Morning commute"
   },
   {
-    id: 2,
+    id: "2",
     origin: "Work",
     destination: "Gym",
-    date: "Yesterday",
-    time: "17:45",
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
     transportType: "Train",
     cost: 2.50,
     description: "Evening workout"
   },
   {
-    id: 3,
+    id: "3",
     origin: "Home",
     destination: "Shopping",
-    date: "Mar 18",
-    time: "14:20",
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
     transportType: "Bus",
     cost: 2.50,
     description: "Weekend shopping"
@@ -53,13 +50,13 @@ const initialTrips = [
 
 export default function UserScreen() {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<Trip[]>(initialTrips);
 
   const handleNewTrip = () => {
     setShowQuickAdd(true);
   };
 
-  const handleTripPress = (tripId: number) => {
+  const handleTripPress = (tripId: string) => {
     router.push(`/(tabs)/trip/${tripId}` as any);
   };
 
@@ -135,31 +132,36 @@ export default function UserScreen() {
         </View>
 
         {trips.map((trip) => (
-          <ThemedView key={trip.id} style={styles.tripCard}>
-            <View style={styles.tripHeader}>
-              <View>
-                <ThemedText style={styles.tripTitle}>
-                  {trip.origin} → {trip.destination}
-                </ThemedText>
-                <ThemedText style={styles.tripDate}>
-                  {trip.date.toLocaleDateString()} {trip.date.toLocaleTimeString()}
-                </ThemedText>
-              </View>
-              <ThemedText style={styles.tripCost}>€{trip.cost.toFixed(2)}</ThemedText>
-            </View>
-            <View style={styles.tripDetails}>
-              <View style={styles.tripDetail}>
-                <IconSymbol name="bus" size={16} color="#666" />
-                <ThemedText style={styles.tripDetailText}>{trip.transportType}</ThemedText>
-              </View>
-              {trip.description && (
-                <View style={styles.tripDetail}>
-                  <IconSymbol name="text.bubble" size={16} color="#666" />
-                  <ThemedText style={styles.tripDetailText}>{trip.description}</ThemedText>
+          <TouchableOpacity 
+            key={trip.id} 
+            onPress={() => handleTripPress(trip.id)}
+          >
+            <ThemedView style={styles.tripCard}>
+              <View style={styles.tripHeader}>
+                <View>
+                  <ThemedText style={styles.tripTitle}>
+                    {trip.origin} → {trip.destination}
+                  </ThemedText>
+                  <ThemedText style={styles.tripDate}>
+                    {trip.date.toLocaleDateString()} {trip.date.toLocaleTimeString()}
+                  </ThemedText>
                 </View>
-              )}
-            </View>
-          </ThemedView>
+                <ThemedText style={styles.tripCost}>€{trip.cost.toFixed(2)}</ThemedText>
+              </View>
+              <View style={styles.tripDetails}>
+                <View style={styles.tripDetail}>
+                  <IconSymbol name="bus" size={16} color="#666" />
+                  <ThemedText style={styles.tripDetailText}>{trip.transportType}</ThemedText>
+                </View>
+                {trip.description && (
+                  <View style={styles.tripDetail}>
+                    <IconSymbol name="text.bubble" size={16} color="#666" />
+                    <ThemedText style={styles.tripDetailText}>{trip.description}</ThemedText>
+                  </View>
+                )}
+              </View>
+            </ThemedView>
+          </TouchableOpacity>
         ))}
       </View>
 
