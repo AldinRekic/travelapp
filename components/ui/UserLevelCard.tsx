@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -28,28 +28,74 @@ export default function UserLevelCard({ level, currentXP, xpToNextLevel }: UserL
       colors={['#4F46E5', '#7C3AED']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      className="rounded-2xl p-4 mb-4"
+      style={styles.container}
     >
-      <View className="flex-row justify-between items-center mb-2">
-        <ThemedText className="text-white text-lg font-bold">Level {level}</ThemedText>
-        <ThemedText className="text-white/80 text-sm">{title}</ThemedText>
+      <View style={styles.header}>
+        <ThemedText style={styles.levelText}>Level {level}</ThemedText>
+        <ThemedText style={styles.titleText}>{title}</ThemedText>
       </View>
       
-      <View className="h-2 bg-white/20 rounded-full overflow-hidden">
+      <View style={styles.progressBar}>
         <View 
-          className="h-full bg-white rounded-full" 
-          style={{ width: `${progress}%` }}
+          style={[styles.progressFill, { width: `${progress}%` }]}
         />
       </View>
       
-      <View className="flex-row justify-between mt-2">
-        <ThemedText className="text-white/80 text-sm">
+      <View style={styles.footer}>
+        <ThemedText style={styles.xpText}>
           {currentXP} / {xpToNextLevel} XP
         </ThemedText>
-        <ThemedText className="text-white/80 text-sm">
+        <ThemedText style={styles.percentageText}>
           {Math.round(progress)}%
         </ThemedText>
       </View>
     </LinearGradient>
   );
-} 
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  levelText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  titleText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 4,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  xpText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+  },
+  percentageText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+  },
+}); 

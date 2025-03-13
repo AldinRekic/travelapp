@@ -20,12 +20,12 @@ const CIRCLE_RADIUS = (CIRCLE_SIZE - CIRCLE_STROKE_WIDTH) / 2;
 const CIRCLE_CENTER = CIRCLE_SIZE / 2;
 
 export function FinancialOverview({ totalTrips, totalDistance, totalCost, klimaTicketCost }: FinancialOverviewProps) {
-  const savings = klimaTicketCost - totalCost;
-  const savingsPercentage = ((savings / klimaTicketCost) * 100).toFixed(1);
+  const savings = totalCost; // The money saved by having the KlimaTicket
+  const savingsPercentage = ((savings / KLIMATICKET_PRICE) * 100).toFixed(1);
+  const remainingToBreakEven = KLIMATICKET_PRICE - savings;
 
-  const percentage = Math.min((totalCost / KLIMATICKET_PRICE) * 100, 100);
-  const remainingValue = Math.max(KLIMATICKET_PRICE - totalCost, 0);
-  const tripsNeeded = Math.ceil(remainingValue / 2.50);
+  const percentage = Math.min((savings / KLIMATICKET_PRICE) * 100, 100);
+  const tripsNeeded = Math.ceil(remainingToBreakEven / 2.50);
 
   const circumference = 2 * Math.PI * CIRCLE_RADIUS;
   const progressOffset = circumference - (percentage / 100) * circumference;
@@ -35,34 +35,41 @@ export function FinancialOverview({ totalTrips, totalDistance, totalCost, klimaT
       colors={['#4F46E5', '#7C3AED']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      className="rounded-2xl p-4 mb-4"
+      style={styles.container}
     >
-      <ThemedText className="text-white text-lg font-bold mb-2">Financial Overview</ThemedText>
+      <ThemedText style={styles.title}>Financial Overview</ThemedText>
       
-      <View className="flex-row justify-between mb-2">
-        <ThemedText className="text-white/80">Total Trips</ThemedText>
-        <ThemedText className="text-white font-semibold">{totalTrips}</ThemedText>
+      <View style={styles.row}>
+        <ThemedText style={styles.label}>Total Trips</ThemedText>
+        <ThemedText style={styles.value}>{totalTrips}</ThemedText>
       </View>
       
-      <View className="flex-row justify-between mb-2">
-        <ThemedText className="text-white/80">Total Distance</ThemedText>
-        <ThemedText className="text-white font-semibold">{totalDistance} km</ThemedText>
+      <View style={styles.row}>
+        <ThemedText style={styles.label}>Total Distance</ThemedText>
+        <ThemedText style={styles.value}>{totalDistance} km</ThemedText>
       </View>
       
-      <View className="flex-row justify-between mb-2">
-        <ThemedText className="text-white/80">Total Cost</ThemedText>
-        <ThemedText className="text-white font-semibold">€{totalCost.toFixed(2)}</ThemedText>
+      <View style={styles.row}>
+        <ThemedText style={styles.label}>Total Cost</ThemedText>
+        <ThemedText style={styles.value}>€{totalCost.toFixed(2)}</ThemedText>
       </View>
       
-      <View className="flex-row justify-between mb-2">
-        <ThemedText className="text-white/80">KlimaTicket Ö Cost</ThemedText>
-        <ThemedText className="text-white font-semibold">€{klimaTicketCost.toFixed(2)}</ThemedText>
+      <View style={styles.row}>
+        <ThemedText style={styles.label}>KlimaTicket Ö Cost</ThemedText>
+        <ThemedText style={styles.value}>€{KLIMATICKET_PRICE.toFixed(2)}</ThemedText>
       </View>
       
-      <View className="flex-row justify-between mt-2 pt-2 border-t border-white/20">
-        <ThemedText className="text-white font-bold">Total Savings</ThemedText>
-        <ThemedText className="text-green-400 font-bold">
+      <View style={styles.savingsRow}>
+        <ThemedText style={styles.savingsLabel}>Money Saved</ThemedText>
+        <ThemedText style={styles.savingsValue}>
           €{savings.toFixed(2)} ({savingsPercentage}%)
+        </ThemedText>
+      </View>
+
+      <View style={styles.breakEvenRow}>
+        <ThemedText style={styles.breakEvenLabel}>To Break Even</ThemedText>
+        <ThemedText style={styles.breakEvenValue}>
+          €{remainingToBreakEven.toFixed(2)} remaining
         </ThemedText>
       </View>
 
@@ -99,21 +106,21 @@ export function FinancialOverview({ totalTrips, totalDistance, totalCost, klimaT
 
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <IconSymbol name="eurosign.circle.fill" size={24} color="#007AFF" />
+          <IconSymbol name="eurosign.circle.fill" size={24} color="#fff" />
           <ThemedText style={styles.statValue}>€{totalCost.toFixed(2)}</ThemedText>
-          <ThemedText style={styles.statLabel}>Total Value</ThemedText>
+          <ThemedText style={styles.statLabel}>Money Saved</ThemedText>
         </View>
 
         <View style={styles.statItem}>
-          <IconSymbol name="bus" size={24} color="#007AFF" />
+          <IconSymbol name="bus" size={24} color="#fff" />
           <ThemedText style={styles.statValue}>{totalTrips}</ThemedText>
           <ThemedText style={styles.statLabel}>Total Trips</ThemedText>
         </View>
 
         <View style={styles.statItem}>
-          <IconSymbol name="arrow.down.circle.fill" size={24} color="#007AFF" />
-          <ThemedText style={styles.statValue}>€{remainingValue.toFixed(2)}</ThemedText>
-          <ThemedText style={styles.statLabel}>Remaining</ThemedText>
+          <IconSymbol name="arrow.up.circle.fill" size={24} color="#fff" />
+          <ThemedText style={styles.statValue}>€{remainingToBreakEven.toFixed(2)}</ThemedText>
+          <ThemedText style={styles.statLabel}>To Break Even</ThemedText>
         </View>
       </View>
 
@@ -132,13 +139,67 @@ export function FinancialOverview({ totalTrips, totalDistance, totalCost, klimaT
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 20,
   },
   title: {
+    color: '#fff',
     fontSize: 20,
-    marginBottom: 20,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  label: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+  },
+  value: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  savingsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  savingsLabel: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  savingsValue: {
+    color: '#4ADE80',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  breakEvenRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  breakEvenLabel: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  breakEvenValue: {
+    color: '#FFA500',
+    fontSize: 16,
+    fontWeight: '600',
   },
   progressContainer: {
     alignItems: 'center',
@@ -164,21 +225,22 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginTop: 20,
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
   },
   statValue: {
-    fontSize: 20,
+    color: '#fff',
+    fontSize: 16,
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: 8,
   },
   statLabel: {
+    color: 'rgba(255, 255, 255, 0.8)',
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    marginTop: 4,
   },
   infoContainer: {
     alignItems: 'center',
