@@ -10,7 +10,7 @@ export default function HomeScreen() {
 				{/* Hero Section */}
 				<View className="relative h-48 bg-blue-500">
 					<Image
-						source={require("@/assets/images/hero-bg.jpg")}
+						source={require("@/assets/images/icon.png")}
 						className="absolute inset-0 w-full h-full"
 						resizeMode="cover"
 					/>
