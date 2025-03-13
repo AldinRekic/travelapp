@@ -69,3 +69,51 @@
 - Consider adding animations to hero section
 - Evaluate need for additional visual feedback
 - Monitor user feedback on new design 
+
+## March 19, 2024 - Refocusing the App's Message
+Today we made significant changes to the app's messaging and focus. The main changes were:
+
+1. Updated the landing page messaging:
+   - Changed main title to "Track Your Trips, Save the Climate"
+   - Added subtitle "And your wallet too"
+   - Revised feature highlights to emphasize both environmental and financial benefits
+   - Added climate impact as a primary benefit alongside cost savings
+
+2. Modified the user profile page:
+   - Renamed to "My Climate Journey"
+   - Updated subtitle to "Track your impact and savings"
+   - Kept the financial overview component but prepared it for future climate impact metrics
+
+3. Refined the value proposition:
+   - Shifted from purely financial focus to dual benefits
+   - Added environmental impact messaging
+   - Maintained the KlimaTicket Ö evaluation feature
+   - Prepared for future climate impact calculations
+
+The changes reflect a more balanced approach to the app's purpose, highlighting both the environmental and financial benefits of tracking public transport usage. This aligns better with the broader goals of sustainable transportation and personal financial management.
+
+Next steps could include:
+- Adding carbon footprint calculations for trips
+- Implementing climate impact visualizations
+- Creating environmental impact statistics
+- Adding transport mode comparison for environmental impact
+
+## March 19, 2024 - Technical Implementation Notes
+While updating the messaging, we maintained the existing technical structure:
+
+1. Component Architecture:
+   - Kept the FinancialOverview component for future expansion
+   - Maintained the trip tracking system
+   - Preserved the navigation structure
+
+2. Data Structure:
+   - Current trip data structure supports future climate metrics
+   - Transport types are categorized for impact calculations
+   - Time-based tracking system remains in place
+
+3. UI/UX Considerations:
+   - Maintained consistent styling across updates
+   - Preserved dark mode support
+   - Kept accessibility features intact
+
+The technical foundation allows for easy addition of climate impact features while maintaining the existing financial tracking functionality. 

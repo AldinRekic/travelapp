@@ -1,41 +1,44 @@
 import { StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { IconSymbol, IconSymbolName } from "@/components/ui/IconSymbol";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { router } from "expo-router";
+import { FinancialOverview } from "@/components/ui/FinancialOverview";
 
 // Dummy data for trips
 const recentTrips = [
   {
     id: 1,
-    destination: "Paris, France",
-    date: "March 15-22, 2024",
-    duration: "7 days",
-    cost: 2500,
-    description: "Spring break in the City of Light"
+    destination: "Work",
+    date: "Today",
+    time: "08:30",
+    transportType: "Bus",
+    cost: 2.50,
+    description: "Morning commute"
   },
   {
     id: 2,
-    destination: "Tokyo, Japan",
-    date: "January 10-20, 2024",
-    duration: "10 days",
-    cost: 3500,
-    description: "Winter exploration of Japanese culture"
+    destination: "Gym",
+    date: "Yesterday",
+    time: "17:45",
+    transportType: "Train",
+    cost: 2.50,
+    description: "Evening workout"
   },
   {
     id: 3,
-    destination: "Bali, Indonesia",
-    date: "December 1-7, 2023",
-    duration: "6 days",
-    cost: 1800,
-    description: "Tropical getaway"
+    destination: "Shopping",
+    date: "Mar 18",
+    time: "14:20",
+    transportType: "Bus",
+    cost: 2.50,
+    description: "Weekend shopping"
   }
 ];
 
 // Calculate statistics
 const totalTrips = recentTrips.length;
 const totalCost = recentTrips.reduce((sum, trip) => sum + trip.cost, 0);
-const averageCost = Math.round(totalCost / totalTrips);
 
 export default function UserScreen() {
   const handleNewTrip = () => {
@@ -50,37 +53,17 @@ export default function UserScreen() {
     <ScrollView style={styles.container}>
       <ThemedView style={styles.header}>
         <ThemedText type="title" style={styles.headerTitle}>
-          Travel Journal
+          My Climate Journey
         </ThemedText>
         <ThemedText style={styles.headerSubtitle}>
-          Your travel memories and statistics
+          Track your impact and savings
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.statsContainer}>
-        <ThemedView style={styles.statCard}>
-          <IconSymbol name="house.fill" size={24} color="#007AFF" />
-          <ThemedText type="defaultSemiBold" style={styles.statValue}>
-            {totalTrips}
-          </ThemedText>
-          <ThemedText style={styles.statLabel}>Total Trips</ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.statCard}>
-          <IconSymbol name="paperplane.fill" size={24} color="#007AFF" />
-          <ThemedText type="defaultSemiBold" style={styles.statValue}>
-            ${totalCost.toLocaleString()}
-          </ThemedText>
-          <ThemedText style={styles.statLabel}>Total Spent</ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.statCard}>
-          <IconSymbol name="chevron.left.forwardslash.chevron.right" size={24} color="#007AFF" />
-          <ThemedText type="defaultSemiBold" style={styles.statValue}>
-            ${averageCost}
-          </ThemedText>
-          <ThemedText style={styles.statLabel}>Avg. Cost</ThemedText>
-        </ThemedView>
-      </ThemedView>
+      {/* Financial Overview */}
+      <FinancialOverview totalTrips={totalTrips} timeFrame="year" />
 
+      {/* Recent Trips */}
       <ThemedView style={styles.section}>
         <ThemedView style={styles.sectionHeader}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
@@ -106,12 +89,16 @@ export default function UserScreen() {
             <ThemedText style={styles.tripDescription}>{trip.description}</ThemedText>
             <ThemedView style={styles.tripDetails}>
               <ThemedView style={styles.tripDetail}>
-                <ThemedText style={styles.tripDetailLabel}>Duration</ThemedText>
-                <ThemedText style={styles.tripDetailValue}>{trip.duration}</ThemedText>
+                <ThemedText style={styles.tripDetailLabel}>Time</ThemedText>
+                <ThemedText style={styles.tripDetailValue}>{trip.time}</ThemedText>
+              </ThemedView>
+              <ThemedView style={styles.tripDetail}>
+                <ThemedText style={styles.tripDetailLabel}>Transport</ThemedText>
+                <ThemedText style={styles.tripDetailValue}>{trip.transportType}</ThemedText>
               </ThemedView>
               <ThemedView style={styles.tripDetail}>
                 <ThemedText style={styles.tripDetailLabel}>Cost</ThemedText>
-                <ThemedText style={styles.tripDetailValue}>${trip.cost.toLocaleString()}</ThemedText>
+                <ThemedText style={styles.tripDetailValue}>€{trip.cost.toFixed(2)}</ThemedText>
               </ThemedView>
             </ThemedView>
           </TouchableOpacity>
@@ -136,34 +123,6 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     opacity: 0.7,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: 0,
-  },
-  statCard: {
-    flex: 1,
-    marginHorizontal: 6,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    marginTop: 8,
-  },
-  statLabel: {
-    fontSize: 12,
-    opacity: 0.7,
-    marginTop: 4,
   },
   section: {
     padding: 20,
