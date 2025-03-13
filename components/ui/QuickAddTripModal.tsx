@@ -49,169 +49,154 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
     onClose();
   };
 
+  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <ThemedView style={styles.modalContent}>
-          <View style={styles.header}>
-            <ThemedText type="subtitle">Quick Add Trip</ThemedText>
-            <TouchableOpacity onPress={onClose}>
-              <IconSymbol name="xmark.circle.fill" size={24} color="#666" />
-            </TouchableOpacity>
-          </View>
+    <>
+      {/* Date Picker rendered outside Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="datetime"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+        />
+      )}
 
-          {/* Origin Input */}
-          <View style={styles.inputContainer}>
-            <IconSymbol name="mappin.circle.fill" size={20} color="#007AFF" />
-            <TextInput
-              style={styles.input}
-              value={origin}
-              onChangeText={setOrigin}
-              placeholder="Origin"
-              placeholderTextColor="#666"
-            />
-          </View>
+      {/* Main Modal */}
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView style={styles.modalContent}>
+            <View style={styles.header}>
+              <ThemedText type="subtitle">Quick Add Trip</ThemedText>
+              <TouchableOpacity onPress={onClose}>
+                <IconSymbol name="xmark.circle.fill" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
 
-          {/* Destination Input */}
-          <View style={styles.inputContainer}>
-            <IconSymbol name="mappin.circle.fill" size={20} color="#007AFF" />
-            <TextInput
-              style={styles.input}
-              value={destination}
-              onChangeText={setDestination}
-              placeholder="Destination"
-              placeholderTextColor="#666"
-            />
-          </View>
-
-          {/* Date Picker */}
-          <TouchableOpacity 
-            style={styles.dateButton}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <IconSymbol name="calendar" size={20} color="#007AFF" />
-            <ThemedText style={styles.dateButtonText}>
-              {date.toLocaleString()}
-            </ThemedText>
-          </TouchableOpacity>
-
-          {showDatePicker && Platform.OS === 'android' && (
-            <DateTimePicker
-              value={date}
-              mode="datetime"
-              display="default"
-              onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  setDate(selectedDate);
-                }
-              }}
-            />
-          )}
-
-          {showDatePicker && Platform.OS === 'ios' && (
-            <View style={styles.datePickerContainer}>
-              <View style={styles.datePickerHeader}>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <ThemedText style={styles.datePickerButton}>Cancel</ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <ThemedText style={[styles.datePickerButton, styles.datePickerButtonDone]}>Done</ThemedText>
-                </TouchableOpacity>
-              </View>
-              <DateTimePicker
-                value={date}
-                mode="datetime"
-                display="spinner"
-                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                  if (selectedDate) {
-                    setDate(selectedDate);
-                  }
-                }}
+            {/* Origin Input */}
+            <View style={styles.inputContainer}>
+              <IconSymbol name="mappin.circle.fill" size={20} color="#007AFF" />
+              <TextInput
+                style={styles.input}
+                value={origin}
+                onChangeText={setOrigin}
+                placeholder="Origin"
+                placeholderTextColor="#666"
               />
             </View>
-          )}
 
-          {/* Transport Type Picker */}
-          <TouchableOpacity 
-            style={styles.dateButton}
-            onPress={() => setShowTransportPicker(true)}
-          >
-            <IconSymbol name="bus" size={20} color="#007AFF" />
-            <ThemedText style={styles.dateButtonText}>
-              {transportType}
-            </ThemedText>
-          </TouchableOpacity>
-
-          {showTransportPicker && (
-            <View style={styles.transportPicker}>
-              {TRANSPORT_TYPES.map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  style={[
-                    styles.transportOption,
-                    transportType === type && styles.transportOptionSelected
-                  ]}
-                  onPress={() => {
-                    setTransportType(type);
-                    setShowTransportPicker(false);
-                  }}
-                >
-                  <ThemedText style={[
-                    styles.transportOptionText,
-                    transportType === type && styles.transportOptionTextSelected
-                  ]}>
-                    {type}
-                  </ThemedText>
-                </TouchableOpacity>
-              ))}
+            {/* Destination Input */}
+            <View style={styles.inputContainer}>
+              <IconSymbol name="mappin.circle.fill" size={20} color="#007AFF" />
+              <TextInput
+                style={styles.input}
+                value={destination}
+                onChangeText={setDestination}
+                placeholder="Destination"
+                placeholderTextColor="#666"
+              />
             </View>
-          )}
 
-          {/* Cost Input */}
-          <View style={styles.inputContainer}>
-            <IconSymbol name="eurosign.circle.fill" size={20} color="#007AFF" />
-            <TextInput
-              style={styles.input}
-              value={cost}
-              onChangeText={setCost}
-              placeholder="Cost (€)"
-              keyboardType="decimal-pad"
-              placeholderTextColor="#666"
-            />
-          </View>
+            {/* Date Picker Button */}
+            <TouchableOpacity 
+              style={styles.dateButton}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <IconSymbol name="calendar" size={20} color="#007AFF" />
+              <ThemedText style={styles.dateButtonText}>
+                {date.toLocaleString()}
+              </ThemedText>
+            </TouchableOpacity>
 
-          {/* Description Input */}
-          <View style={styles.inputContainer}>
-            <IconSymbol name="text.bubble" size={20} color="#007AFF" />
-            <TextInput
-              style={styles.input}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Description (optional)"
-              placeholderTextColor="#666"
-            />
-          </View>
+            {/* Transport Type Picker */}
+            <TouchableOpacity 
+              style={styles.dateButton}
+              onPress={() => setShowTransportPicker(true)}
+            >
+              <IconSymbol name="bus" size={20} color="#007AFF" />
+              <ThemedText style={styles.dateButtonText}>
+                {transportType}
+              </ThemedText>
+            </TouchableOpacity>
 
-          {/* Submit Button */}
-          <TouchableOpacity 
-            style={[
-              styles.submitButton,
-              (!origin || !destination || !cost) && styles.submitButtonDisabled
-            ]}
-            onPress={handleSubmit}
-            disabled={!origin || !destination || !cost}
-          >
-            <ThemedText style={styles.submitButtonText}>Add Trip</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-      </View>
-    </Modal>
+            {showTransportPicker && (
+              <View style={styles.transportPicker}>
+                {TRANSPORT_TYPES.map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.transportOption,
+                      transportType === type && styles.transportOptionSelected
+                    ]}
+                    onPress={() => {
+                      setTransportType(type);
+                      setShowTransportPicker(false);
+                    }}
+                  >
+                    <ThemedText style={[
+                      styles.transportOptionText,
+                      transportType === type && styles.transportOptionTextSelected
+                    ]}>
+                      {type}
+                    </ThemedText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {/* Cost Input */}
+            <View style={styles.inputContainer}>
+              <IconSymbol name="eurosign.circle.fill" size={20} color="#007AFF" />
+              <TextInput
+                style={styles.input}
+                value={cost}
+                onChangeText={setCost}
+                placeholder="Cost (€)"
+                keyboardType="decimal-pad"
+                placeholderTextColor="#666"
+              />
+            </View>
+
+            {/* Description Input */}
+            <View style={styles.inputContainer}>
+              <IconSymbol name="text.bubble" size={20} color="#007AFF" />
+              <TextInput
+                style={styles.input}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Description (optional)"
+                placeholderTextColor="#666"
+              />
+            </View>
+
+            {/* Submit Button */}
+            <TouchableOpacity 
+              style={[
+                styles.submitButton,
+                (!origin || !destination || !cost) && styles.submitButtonDisabled
+              ]}
+              onPress={handleSubmit}
+              disabled={!origin || !destination || !cost}
+            >
+              <ThemedText style={styles.submitButtonText}>Add Trip</ThemedText>
+            </TouchableOpacity>
+          </ThemedView>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -301,26 +286,6 @@ const styles = StyleSheet.create({
   },
   transportOptionTextSelected: {
     color: '#007AFF',
-    fontWeight: '600',
-  },
-  datePickerContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  datePickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  datePickerButton: {
-    fontSize: 16,
-    color: '#007AFF',
-  },
-  datePickerButtonDone: {
     fontWeight: '600',
   },
 }); 
