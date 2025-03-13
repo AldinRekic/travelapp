@@ -110,96 +110,90 @@ export default function LoginForm() {
   };
 
   return (
-    <View className="w-full px-4 py-6">
-      <View className="space-y-4">
-        <ThemedText type="title" className="text-center mb-6">
-          Welcome Back
-        </ThemedText>
+    <View className="space-y-4">
+      <Controller
+        control={control}
+        name="email"
+        rules={{
+          required: "Email is required",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Invalid email address",
+          },
+        }}
+        render={({ field: { onChange, value } }) => (
+          <View>
+            <TextInput
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
+              placeholder="Email"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onChangeText={onChange}
+              value={value}
+              editable={attempts < MAX_ATTEMPTS}
+            />
+            {errors.email && (
+              <ThemedText className="text-red-500 text-sm mt-1">{errors.email.message}</ThemedText>
+            )}
+          </View>
+        )}
+      />
 
-        <Controller
-          control={control}
-          name="email"
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address",
-            },
-          }}
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
-                placeholder="Email"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={onChange}
-                value={value}
-                editable={attempts < MAX_ATTEMPTS}
-              />
-              {errors.email && (
-                <ThemedText className="text-red-500 text-sm mt-1">{errors.email.message}</ThemedText>
-              )}
-            </View>
-          )}
-        />
+      <Controller
+        control={control}
+        name="password"
+        rules={{
+          required: "Password is required",
+          minLength: {
+            value: 6,
+            message: "Password must be at least 6 characters",
+          },
+        }}
+        render={({ field: { onChange, value } }) => (
+          <View>
+            <TextInput
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
+              placeholder="Password"
+              placeholderTextColor="#9CA3AF"
+              secureTextEntry
+              onChangeText={onChange}
+              value={value}
+              editable={attempts < MAX_ATTEMPTS}
+            />
+            {errors.password && (
+              <ThemedText className="text-red-500 text-sm mt-1">{errors.password.message}</ThemedText>
+            )}
+          </View>
+        )}
+      />
 
-        <Controller
-          control={control}
-          name="password"
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
-          }}
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
-                placeholder="Password"
-                placeholderTextColor="#9CA3AF"
-                secureTextEntry
-                onChangeText={onChange}
-                value={value}
-                editable={attempts < MAX_ATTEMPTS}
-              />
-              {errors.password && (
-                <ThemedText className="text-red-500 text-sm mt-1">{errors.password.message}</ThemedText>
-              )}
-            </View>
-          )}
-        />
+      {error && <ThemedText className="text-red-500 text-sm text-center">{error}</ThemedText>}
 
-        {error && <ThemedText className="text-red-500 text-sm text-center">{error}</ThemedText>}
+      <TouchableOpacity
+        className="bg-blue-500 rounded-lg py-3 px-4 mt-4"
+        onPress={handleSubmit(onSubmit)}
+        disabled={isSubmitting || attempts >= MAX_ATTEMPTS}
+      >
+        {isSubmitting ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <ThemedText className="text-white text-center font-semibold">Login</ThemedText>
+        )}
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          className="bg-blue-500 rounded-lg py-3 px-4 mt-4"
-          onPress={handleSubmit(onSubmit)}
-          disabled={isSubmitting || attempts >= MAX_ATTEMPTS}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <ThemedText className="text-white text-center font-semibold">Login</ThemedText>
-          )}
+      <View className="flex-row justify-between mt-4">
+        <TouchableOpacity onPress={handleForgotPassword}>
+          <ThemedText className="text-blue-500 text-sm">Forgot Password?</ThemedText>
         </TouchableOpacity>
-
-        <View className="flex-row justify-between mt-4">
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <ThemedText className="text-blue-500 text-sm">Forgot Password?</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSignUp}>
-            <ThemedText className="text-blue-500 text-sm">Sign Up</ThemedText>
-          </TouchableOpacity>
-        </View>
-
-        <ThemedText className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-          Test credentials: test@example.com / password123
-        </ThemedText>
+        <TouchableOpacity onPress={handleSignUp}>
+          <ThemedText className="text-blue-500 text-sm">Sign Up</ThemedText>
+        </TouchableOpacity>
       </View>
+
+      <ThemedText className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
+        Test credentials: test@example.com / password123
+      </ThemedText>
     </View>
   );
 } 

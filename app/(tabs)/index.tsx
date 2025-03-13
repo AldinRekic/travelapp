@@ -1,70 +1,59 @@
-import { Image, StyleSheet } from "react-native";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
+import React from "react";
+import { View, ScrollView, Image } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import LoginForm from "@/components/ui/LoginForm";
 
 export default function HomeScreen() {
 	return (
-		<ParallaxScrollView
-			headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-			headerImage={
-				<Image
-					source={require("@/assets/images/partial-react-logo.png")}
-					style={styles.reactLogo}
-				/>
-			}
-		>
-			<ThemedView className="px-4 py-6">
-				<ThemedText type="title" className="text-center mb-6">
-					Welcome to TravelApp
-				</ThemedText>
-				<ThemedText type="subtitle" className="text-center mb-8">
-					Your journey begins here
-				</ThemedText>
+		<ScrollView className="flex-1 bg-gray-50 dark:bg-gray-900">
+			<View className="flex-1">
+				{/* Hero Section */}
+				<View className="relative h-48 bg-blue-500">
+					<Image
+						source={require("@/assets/images/hero-bg.jpg")}
+						className="absolute inset-0 w-full h-full"
+						resizeMode="cover"
+					/>
+					<View className="absolute inset-0 bg-black/40" />
+					<View className="absolute inset-0 flex items-center justify-center">
+						<ThemedText type="title" className="text-white text-3xl font-bold text-center">
+							Welcome to TravelApp
+						</ThemedText>
+					</View>
+				</View>
 
-				<LoginForm />
+				{/* Login Form Section */}
+				<View className="px-4 py-6">
+					<LoginForm />
+				</View>
 
-				<ThemedView className="mt-8 space-y-4">
-					<ThemedText type="subtitle" className="text-center">
+				{/* Feature Highlights */}
+				<View className="px-4 py-6 bg-white dark:bg-gray-800">
+					<ThemedText type="title" className="text-center mb-6">
 						Why Choose TravelApp?
 					</ThemedText>
-					
-					<ThemedView className="space-y-3">
-						<FeatureItem 
-							title="Plan Your Trips"
-							description="Create detailed itineraries and organize your travel plans"
-						/>
-						<FeatureItem 
-							title="Discover Destinations"
-							description="Explore new places and get inspired for your next adventure"
-						/>
-						<FeatureItem 
-							title="Share Experiences"
-							description="Connect with fellow travelers and share your journey"
-						/>
-					</ThemedView>
-				</ThemedView>
-			</ThemedView>
-		</ParallaxScrollView>
+					<View className="space-y-4">
+						<View className="flex-row items-center space-x-3">
+							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center">
+								<ThemedText className="text-blue-500 dark:text-blue-300">✓</ThemedText>
+							</View>
+							<ThemedText>Personalized travel recommendations</ThemedText>
+						</View>
+						<View className="flex-row items-center space-x-3">
+							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center">
+								<ThemedText className="text-blue-500 dark:text-blue-300">✓</ThemedText>
+							</View>
+							<ThemedText>Local insights and tips</ThemedText>
+						</View>
+						<View className="flex-row items-center space-x-3">
+							<View className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full items-center justify-center">
+								<ThemedText className="text-blue-500 dark:text-blue-300">✓</ThemedText>
+							</View>
+							<ThemedText>Offline access to travel guides</ThemedText>
+						</View>
+					</View>
+				</View>
+			</View>
+		</ScrollView>
 	);
 }
-
-function FeatureItem({ title, description }: { title: string; description: string }) {
-	return (
-		<ThemedView className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-			<ThemedText type="defaultSemiBold" className="mb-1">{title}</ThemedText>
-			<ThemedText type="default" className="text-gray-600 dark:text-gray-300">{description}</ThemedText>
-		</ThemedView>
-	);
-}
-
-const styles = StyleSheet.create({
-	reactLogo: {
-		height: 178,
-		width: 290,
-		bottom: 0,
-		left: 0,
-		position: "absolute",
-	},
-});
