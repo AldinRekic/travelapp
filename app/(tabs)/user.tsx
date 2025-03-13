@@ -7,8 +7,8 @@ import { FinancialOverview } from "@/components/ui/FinancialOverview";
 import { QuickAddTripModal } from "@/components/ui/QuickAddTripModal";
 import { useState } from "react";
 
-// Dummy data for trips
-const recentTrips = [
+// Initial dummy data for trips
+const initialTrips = [
   {
     id: 1,
     destination: "Work",
@@ -38,11 +38,8 @@ const recentTrips = [
   }
 ];
 
-// Calculate statistics
-const totalTrips = recentTrips.length;
-const totalCost = recentTrips.reduce((sum, trip) => sum + trip.cost, 0);
-
 export default function UserScreen() {
+  const [trips, setTrips] = useState(initialTrips);
   const [showQuickAddModal, setShowQuickAddModal] = useState(false);
 
   const handleNewTrip = () => {
@@ -53,10 +50,46 @@ export default function UserScreen() {
     router.push(`/(tabs)/trip/${tripId}` as any);
   };
 
-  const handleQuickAddSubmit = (trip: { date: Date; cost: number; description?: string }) => {
-    // TODO: Implement actual trip creation
-    console.log('New trip:', trip);
+  const formatDate = (date: Date) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
   };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    });
+  };
+
+  const handleQuickAddSubmit = (trip: { date: Date; cost: number; description?: string }) => {
+    const newTrip = {
+      id: trips.length + 1,
+      destination: trip.description || "Quick Trip",
+      date: formatDate(trip.date),
+      time: formatTime(trip.date),
+      transportType: "Bus", // Default to Bus for now
+      cost: trip.cost,
+      description: trip.description || "" // Ensure description is always a string
+    };
+
+    setTrips(prevTrips => [newTrip, ...prevTrips]);
+  };
+
+  // Calculate statistics
+  const totalTrips = trips.length;
+  const totalCost = trips.reduce((sum, trip) => sum + trip.cost, 0);
 
   return (
     <ScrollView style={styles.container}>
@@ -83,7 +116,7 @@ export default function UserScreen() {
             <ThemedText style={styles.newTripButtonText}>New Trip</ThemedText>
           </TouchableOpacity>
         </ThemedView>
-        {recentTrips.map((trip) => (
+        {trips.map((trip) => (
           <TouchableOpacity 
             key={trip.id} 
             style={styles.tripCard}
