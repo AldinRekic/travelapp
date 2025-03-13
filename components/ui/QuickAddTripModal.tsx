@@ -100,20 +100,41 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
             </ThemedText>
           </TouchableOpacity>
 
-          {showDatePicker && (
+          {showDatePicker && Platform.OS === 'android' && (
             <DateTimePicker
               value={date}
               mode="datetime"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              display="default"
               onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                if (Platform.OS === 'android') {
-                  setShowDatePicker(false);
-                }
+                setShowDatePicker(false);
                 if (selectedDate) {
                   setDate(selectedDate);
                 }
               }}
             />
+          )}
+
+          {showDatePicker && Platform.OS === 'ios' && (
+            <View style={styles.datePickerContainer}>
+              <View style={styles.datePickerHeader}>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <ThemedText style={styles.datePickerButton}>Cancel</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <ThemedText style={[styles.datePickerButton, styles.datePickerButtonDone]}>Done</ThemedText>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={date}
+                mode="datetime"
+                display="spinner"
+                onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                  if (selectedDate) {
+                    setDate(selectedDate);
+                  }
+                }}
+              />
+            </View>
           )}
 
           {/* Transport Type Picker */}
@@ -280,6 +301,26 @@ const styles = StyleSheet.create({
   },
   transportOptionTextSelected: {
     color: '#007AFF',
+    fontWeight: '600',
+  },
+  datePickerContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  datePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  datePickerButton: {
+    fontSize: 16,
+    color: '#007AFF',
+  },
+  datePickerButtonDone: {
     fontWeight: '600',
   },
 }); 
