@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { Modal, View, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -104,9 +104,11 @@ export function QuickAddTripModal({ visible, onClose, onSubmit }: QuickAddTripMo
             <DateTimePicker
               value={date}
               mode="datetime"
-              display="default"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
-                setShowDatePicker(false);
+                if (Platform.OS === 'android') {
+                  setShowDatePicker(false);
+                }
                 if (selectedDate) {
                   setDate(selectedDate);
                 }
